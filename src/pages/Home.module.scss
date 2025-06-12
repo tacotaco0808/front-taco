@@ -1,0 +1,10 @@
+@use "../styles/variables";
+@import url("https://fonts.googleapis.com/css2?family=M+PLUS+1p&display=swap");
+body {
+  background-color: variables.$posterBrown;
+  font-family: "M PLUS 1p", sans-serif;
+  font-size: 16px;
+}
+.test {
+  color: rebeccapurple;
+}

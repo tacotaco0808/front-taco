@@ -1,0 +1,13 @@
+@import "./styles/reset.scss";
+@import "normalize.css";
+
+/* 自分で設定する、グローバルのスタイル */
+body {
+  background-color: #fafafa;
+}
+li {
+  list-style: none;
+}
+a {
+  text-decoration: none;
+}
