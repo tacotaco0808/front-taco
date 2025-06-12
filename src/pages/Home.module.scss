@@ -8,3 +8,9 @@ body {
 .test {
   color: rebeccapurple;
 }
+.mv_wrapper {
+  .mv_background {
+    margin: 0 auto;
+    height: 100vh;
+  }
+}

@@ -1,8 +1,11 @@
 import styles from "./Home.module.scss";
+import HomeBackground from "../assets/ドット部屋.png";
 export const Home = () => {
   return (
     <div>
-      <h1 className={styles.test}>asfd</h1>
+      <div className={styles.mv_wrapper}>
+        <img className={styles.mv_background} src={HomeBackground} alt="" />
+      </div>
     </div>
   );
 };
