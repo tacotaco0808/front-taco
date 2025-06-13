@@ -3,7 +3,7 @@ import type { Image, UUID } from "../types/image";
 export async function createImageUrl(image_public_id: UUID) {
   try {
     // 指定の画像データ取得
-    const res = await axios.get("http://localhost:8000/image", {
+    const res = await axios.get(`${import.meta.env.VITE_IMAGE_API}/image`, {
       params: {
         public_id: image_public_id,
       },
