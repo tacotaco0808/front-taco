@@ -8,3 +8,6 @@ export interface Image {
   format: string;
   version: number;
 }
+export interface GalleryImage extends Image {
+  url: string;
+}
