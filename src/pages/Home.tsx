@@ -2,6 +2,7 @@ import styles from "./Home.module.scss";
 import HomeBackground from "../assets/ドット部屋.png";
 
 import { ImagesList } from "../components/ImagesList";
+import { PhaserGame } from "../components/PhaserGame";
 export const Home = () => {
   return (
     <div>
@@ -11,6 +12,7 @@ export const Home = () => {
           {/* <ImagesGallery /> */}
           <ImagesList />
         </div>
+        <PhaserGame />
       </div>
 
       {/* <SimpleGallery publicId="e8f82240-61a0-4ef0-a6a3-92e031d0d01e" /> */}
