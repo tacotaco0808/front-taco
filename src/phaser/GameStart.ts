@@ -2,6 +2,7 @@ import { AUTO, Game } from "phaser";
 import { Boot } from "./scenes/Boot";
 import { Preloader } from "./scenes/Preloader";
 import { MainGame } from "./scenes/MainGame";
+import { SpinePlugin } from "@esotericsoftware/spine-phaser-v3";
 
 export const GameStart = (
   parent: string,
@@ -15,7 +16,7 @@ export const GameStart = (
     type: AUTO,
     width: 500,
     height: 500,
-    parent: "game-container",
+    parent: parent,
     backgroundColor: "#028af8",
     scene: [Boot, Preloader, mainGame],
     physics: {
@@ -28,6 +29,15 @@ export const GameStart = (
         debug: true,
       },
     },
+    plugins: {
+      scene: [
+        {
+          key: "spine.SpinePlugin",
+          plugin: SpinePlugin,
+          mapping: "spine",
+        },
+      ],
+    },
   };
-  return new Game({ ...config, parent });
+  return new Game(config);
 };

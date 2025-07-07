@@ -1,3 +1,4 @@
+import type { SpineGameObject } from "@esotericsoftware/spine-phaser-v3";
 import { Scene } from "phaser";
 
 export class MainGame extends Scene {
@@ -11,6 +12,8 @@ export class MainGame extends Scene {
   pcObj!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
   pcObjSize = 7;
   isOverlapping = false;
+  promptDecide!: SpineGameObject;
+
   // method from react
   toggleShowGallery?: () => void;
 
@@ -33,7 +36,7 @@ export class MainGame extends Scene {
 
     //player
     this.player = this.physics.add.sprite(
-      this.cameras.main.centerX + 30,
+      this.cameras.main.centerX + 60,
       this.cameras.main.centerY + 160,
       "mendako"
     );
@@ -58,8 +61,18 @@ export class MainGame extends Scene {
     this.pcObj.setScale(pcObjScale);
     this.pcObj.setVisible(false);
 
+    //promptDecide
+    this.promptDecide = this.add.spine(250, 300, "prompt-data", "prompt-atlas");
+    this.promptDecide.animationState.setAnimation(0, "animation", true);
+    this.promptDecide.setScale(this.cameras.main.width / 20 / this.pcObj.width);
+    this.promptDecide.setVisible(false);
+
     //overlap
     this.physics.add.overlap(this.player, this.pcObj, () => {
+      if (!this.promptDecide.visible) {
+        this.promptDecide.setVisible(true);
+      }
+      this.promptDecide.setPosition(this.pcObj.x, this.pcObj.y - 80);
       this.isOverlapping = true;
     });
   }
@@ -83,6 +96,8 @@ export class MainGame extends Scene {
         this.toggleShowGallery();
       }
     }
+    // 表示切り替えをフラグで制御
+    this.promptDecide.setVisible(this.isOverlapping);
 
     this.isOverlapping = false;
   }
