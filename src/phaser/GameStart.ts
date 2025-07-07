@@ -11,6 +11,16 @@ export const GameStart = (parent: string) => {
     parent: "game-container",
     backgroundColor: "#028af8",
     scene: [Boot, Preloader, MainGame],
+    physics: {
+      default: "arcade",
+      arcade: {
+        gravity: {
+          y: 0,
+          x: 0,
+        },
+        debug: true,
+      },
+    },
   };
   return new Game({ ...config, parent });
 };
