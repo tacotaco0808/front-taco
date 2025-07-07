@@ -20,9 +20,18 @@ export const Home = () => {
           <ImagesList />
         </div> */}
         <PhaserGame setSceneFunc={handleSetSceneFunc} />
-        <p>カーソル（←↑→↓）で動かしてみよう</p>
+        <p>
+          カーソル（←↑→↓）で動かしてみよう <br />
+          スペースで決定
+        </p>
       </div>
-
+      <div>
+        {isVisbleGallery && (
+          <div className={styles.mv_gallery}>
+            <ImagesList />
+          </div>
+        )}
+      </div>
       {/* <SimpleGallery publicId="e8f82240-61a0-4ef0-a6a3-92e031d0d01e" /> */}
     </div>
   );

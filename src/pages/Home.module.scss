@@ -11,7 +11,7 @@ body {
 .mv_wrapper {
   position: relative;
   width: 100%;
-  height: 100vh;
+  height: 90vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -33,4 +33,8 @@ body {
     // justify-content: center;
     align-items: center;
   }
+}
+.mv_gallery {
+  display: flex;
+  justify-content: center;
 }
