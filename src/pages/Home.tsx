@@ -1,6 +1,5 @@
 import styles from "./Home.module.scss";
-import HomeBackground from "../assets/ドット部屋.png";
-
+import WindowBar from "/assets/window_bar.png";
 import { ImagesList } from "../components/ImagesList";
 import { PhaserGame } from "../components/PhaserGame";
 import { useState } from "react";
@@ -22,13 +21,17 @@ export const Home = () => {
         <PhaserGame setSceneFunc={handleSetSceneFunc} />
         <p>
           カーソル（←↑→↓）で動かしてみよう <br />
-          スペースで決定
+          スペースで決定 <br />
+          PCを開いてみよう
         </p>
       </div>
       <div>
         {isVisbleGallery && (
           <div className={styles.mv_gallery}>
-            <ImagesList />
+            <div className={styles.pc_window}>
+              <img src={WindowBar} />
+              <ImagesList />
+            </div>
           </div>
         )}
       </div>
