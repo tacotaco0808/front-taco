@@ -10,6 +10,7 @@ export class Preloader extends Scene {
   preload() {
     this.load.setPath("assets");
     this.load.image("mendako", "dot_mendako.png");
+    this.load.image("pc-obj", "dot_mendako.png");
     this.load.on("complete", () => {
       this.scene.start("MainGame");
     });

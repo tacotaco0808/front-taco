@@ -8,6 +8,9 @@ export class MainGame extends Scene {
   playerSize = 5;
   cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   spaceBar!: Phaser.Input.Keyboard.Key;
+  pcObj!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+  pcObjSize = 7;
+  isOverlapping = false;
   // method from react
   toggleShowGallery?: () => void;
 
@@ -43,6 +46,22 @@ export class MainGame extends Scene {
     this.spaceBar = this.input.keyboard!.addKey(
       Phaser.Input.Keyboard.KeyCodes.SPACE
     );
+
+    //PC
+    this.pcObj = this.physics.add.sprite(
+      this.cameras.main.centerX - 50,
+      this.cameras.main.centerY + 130,
+      "pc-obj"
+    );
+    const pcObjScale =
+      this.cameras.main.width / this.pcObjSize / this.pcObj.width;
+    this.pcObj.setScale(pcObjScale);
+    this.pcObj.setVisible(false);
+
+    //overlap
+    this.physics.add.overlap(this.player, this.pcObj, () => {
+      this.isOverlapping = true;
+    });
   }
   update() {
     if (this.cursors.right.isDown) {
@@ -59,10 +78,12 @@ export class MainGame extends Scene {
     } else {
       this.player.setVelocityY(0);
     }
-    if (Phaser.Input.Keyboard.JustDown(this.spaceBar)) {
+    if (Phaser.Input.Keyboard.JustDown(this.spaceBar) && this.isOverlapping) {
       if (this.toggleShowGallery) {
         this.toggleShowGallery();
       }
     }
+
+    this.isOverlapping = false;
   }
 }
