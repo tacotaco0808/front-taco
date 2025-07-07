@@ -3,7 +3,15 @@ import HomeBackground from "../assets/ドット部屋.png";
 
 import { ImagesList } from "../components/ImagesList";
 import { PhaserGame } from "../components/PhaserGame";
+import { useState } from "react";
+import type { MainGame } from "../phaser/scenes/MainGame";
 export const Home = () => {
+  const [isVisbleGallery, setIsVisibleGallery] = useState(false);
+  const handleSetSceneFunc = (scene: Phaser.Scene) => {
+    (scene as MainGame).toggleShowGallery = () => {
+      setIsVisibleGallery((prev) => !prev);
+    };
+  };
   return (
     <div>
       <div className={styles.mv_wrapper}>
@@ -11,7 +19,7 @@ export const Home = () => {
         <div className={styles.gallery_wrapper}>
           <ImagesList />
         </div> */}
-        <PhaserGame />
+        <PhaserGame setSceneFunc={handleSetSceneFunc} />
         <p>カーソル（←↑→↓）で動かしてみよう</p>
       </div>
 

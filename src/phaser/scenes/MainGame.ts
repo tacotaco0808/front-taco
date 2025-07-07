@@ -1,11 +1,16 @@
 import { Scene } from "phaser";
 
 export class MainGame extends Scene {
+  // member
   background!: Phaser.GameObjects.Image;
   player!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
   playerSpeed = 100;
   playerSize = 5;
   cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+  spaceBar!: Phaser.Input.Keyboard.Key;
+  // method from react
+  toggleShowGallery?: () => void;
+
   constructor() {
     super("MainGame");
   }
@@ -35,6 +40,9 @@ export class MainGame extends Scene {
 
     //keyboard
     this.cursors = this.input.keyboard!.createCursorKeys();
+    this.spaceBar = this.input.keyboard!.addKey(
+      Phaser.Input.Keyboard.KeyCodes.SPACE
+    );
   }
   update() {
     if (this.cursors.right.isDown) {
@@ -50,6 +58,11 @@ export class MainGame extends Scene {
       this.player.setVelocityY(-1 * this.playerSpeed);
     } else {
       this.player.setVelocityY(0);
+    }
+    if (Phaser.Input.Keyboard.JustDown(this.spaceBar)) {
+      if (this.toggleShowGallery) {
+        this.toggleShowGallery();
+      }
     }
   }
 }
