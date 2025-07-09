@@ -11,25 +11,34 @@ type Props = {
 };
 export const ImagesList = ({ user_id, format }: Props) => {
   const [imagesData, setImagesData] = useState<GalleryImage[]>([]);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   //データ取得
   useEffect(() => {
+    setError(null);
     async function fetchUrlList() {
-      const images: Image[] = await fetchImagesData({ user_id, format });
-      const urlList = createImagesUrlList(images);
-      if (urlList) {
-        const galleryImages: GalleryImage[] = images.map((image, index) => ({
-          ...image,
-          url: urlList[index],
-        }));
-        setImagesData(galleryImages);
-      } else {
-        setError(true);
+      try {
+        const images: Image[] = await fetchImagesData({ user_id, format });
+        const urlList = createImagesUrlList(images);
+        if (urlList) {
+          const galleryImages: GalleryImage[] = images.map((image, index) => ({
+            ...image,
+            url: urlList[index],
+          }));
+          setImagesData(galleryImages);
+        } else {
+          throw new Error("検索された画像は見つかりませんでした。");
+        }
+      } catch (error) {
+        if (error instanceof Error) {
+          setError(error.message);
+        } else {
+          setError("不明なエラー");
+        }
       }
     }
     fetchUrlList();
-  }, []);
+  }, [format, user_id]);
 
   //   //スライドショーのインターバル
   //   useEffect(() => {
@@ -41,7 +50,7 @@ export const ImagesList = ({ user_id, format }: Props) => {
   //   }, [imagesData, interval]);
 
   if (error) {
-    return <>画像のURL作成に失敗しました。</>;
+    return <>{error}</>;
   }
 
   return (
