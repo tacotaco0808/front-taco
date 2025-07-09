@@ -47,7 +47,7 @@ export const ImagesList = ({ user_id, format }: Props) => {
   return (
     <>
       {imagesData.length > 0 && (
-        <ImageList sx={{ width: 500, height: 450 }}>
+        <ImageList sx={{ width: "90%", height: 450 }}>
           {imagesData.map((item, index) => (
             <ImageListItem className={styles.imagelist_item} key={index}>
               <img src={item.url} alt="" />
