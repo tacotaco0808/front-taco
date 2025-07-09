@@ -1,11 +1,11 @@
 import styles from "./Home.module.scss";
 import WindowBar from "/assets/window_bar.png";
-import { ImagesList } from "../components/ImagesList";
 import { PhaserGame } from "../components/PhaserGame";
 import { useState } from "react";
 import type { MainGame } from "../phaser/scenes/MainGame";
+import { SearchImages } from "../components/SearchImages";
 export const Home = () => {
-  const [isVisbleGallery, setIsVisibleGallery] = useState(false);
+  const [isVisbleGallery, setIsVisibleGallery] = useState(true);
   const handleSetSceneFunc = (scene: Phaser.Scene) => {
     (scene as MainGame).toggleShowGallery = () => {
       setIsVisibleGallery((prev) => !prev);
@@ -30,7 +30,7 @@ export const Home = () => {
           <div className={styles.mv_gallery}>
             <div className={styles.pc_window}>
               <img src={WindowBar} />
-              <ImagesList />
+              <SearchImages />
             </div>
           </div>
         )}

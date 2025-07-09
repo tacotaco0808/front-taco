@@ -29,7 +29,7 @@ export const ImagesList = ({ user_id, format }: Props) => {
       }
     }
     fetchUrlList();
-  }, []);
+  }, [format, user_id]);
 
   //   //スライドショーのインターバル
   //   useEffect(() => {
