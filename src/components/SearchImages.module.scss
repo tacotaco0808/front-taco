@@ -1,0 +1,14 @@
+.wrapper {
+  margin-top: 2rem;
+  width: 95%;
+  display: flex;
+  .search_userid {
+    width: 100%;
+    min-width: 20rem;
+    display: flex;
+    flex-direction: row;
+    .input {
+      width: 100%;
+    }
+  }
+}

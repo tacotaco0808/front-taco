@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { ImagesList } from "./ImagesList";
+import styles from "./SearchImages.module.scss";
 
 export const SearchImages = () => {
   const [format, setFormat] = useState<string>();
@@ -41,7 +42,7 @@ export const SearchImages = () => {
   };
   return (
     <>
-      <div>
+      <div className={styles.wrapper}>
         <FormControl sx={{ minWidth: "10rem" }}>
           <InputLabel id="search-format-label">Search Format</InputLabel>
           <Select
@@ -57,9 +58,10 @@ export const SearchImages = () => {
             <MenuItem value={"jpeg"}>jpeg</MenuItem>
           </Select>
         </FormControl>
-        <FormControl sx={{ minWidth: "20rem" }}>
+        <FormControl className={styles.search_userid}>
           <InputLabel htmlFor="search-userid">Search User ID</InputLabel>
           <Input
+            className={styles.input}
             id="search-userid"
             aria-describedby="userid-helper-text"
             value={user_id ?? ""}
@@ -70,9 +72,11 @@ export const SearchImages = () => {
               }
             }}
           />
-          <FormHelperText id="userid-helper-text">
-            Search images from User ID
-          </FormHelperText>
+
+          {/* <FormHelperText id="userid-helper-text">
+              Search images from User ID
+            </FormHelperText> */}
+
           <Button variant="outlined" onClick={handleClickButton} sx={{ ml: 2 }}>
             Search
           </Button>
