@@ -41,14 +41,14 @@ body {
   background-color: rgb(44, 145, 145);
   .pc_window {
     max-width: 50%;
-    img {
-      background-color: rgb(44, 145, 145);
-    }
     display: flex;
     justify-content: center;
     flex-direction: column;
     align-items: center;
     margin-top: 2rem;
     background-color: aquamarine;
+    img {
+      background-color: rgb(44, 145, 145);
+    }
   }
 }
