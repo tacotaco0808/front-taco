@@ -5,7 +5,7 @@ import { useState } from "react";
 import type { MainGame } from "../phaser/scenes/MainGame";
 import { SearchImages } from "../components/SearchImages";
 export const Home = () => {
-  const [isVisbleGallery, setIsVisibleGallery] = useState(true);
+  const [isVisbleGallery, setIsVisibleGallery] = useState(false);
   const handleSetSceneFunc = (scene: Phaser.Scene) => {
     (scene as MainGame).toggleShowGallery = () => {
       setIsVisibleGallery((prev) => !prev);
