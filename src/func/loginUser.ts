@@ -8,7 +8,10 @@ export async function loginUser(login_id: string, password: string) {
         username: login_id,
         password: password,
       },
-      { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+      {
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        withCredentials: true,
+      }
     );
     return res.data;
   } catch (error) {
