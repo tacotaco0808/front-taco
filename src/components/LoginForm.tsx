@@ -7,16 +7,12 @@ export const LoginForm = () => {
   const [password, setPassword] = useState<string>("");
   const [loginId, setLoginId] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const [token, setToken] = useState("");
   const handleClickButton = async () => {
     if (!loginId || !password) {
       return;
     }
     try {
-      const res = await loginUser(loginId, password);
-      if (res.access_token) {
-        setToken(res.access_token);
-      }
+      await loginUser(loginId, password);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const detail = error.response?.data?.detail;
