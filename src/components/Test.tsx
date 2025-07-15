@@ -7,7 +7,7 @@ export const Test = () => {
       const res = await axios.get(`${import.meta.env.VITE_IMAGE_API}/me`, {
         withCredentials: true,
       });
-      console.log(res);
+      console.log(res.data);
       return res;
     };
     testFetch();

@@ -1,7 +1,10 @@
 import type { SpineGameObject } from "@esotericsoftware/spine-phaser-v3";
 import { Scene } from "phaser";
-
+import type { UserData } from "../types/PhaserTypes";
 export class MainGame extends Scene {
+  // ログイン情報から取得したデータ
+  userName: string = "Guest";
+
   // member
   background!: Phaser.GameObjects.Image;
   player!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
@@ -14,6 +17,12 @@ export class MainGame extends Scene {
   isOverlapping = false;
   promptDecide!: SpineGameObject;
 
+  //userDataSetter
+  setUserData(userData: UserData) {
+    this.userName = userData.user_name;
+    console.log("userData受け取った:", userData);
+  }
+
   // method from react
   toggleShowGallery?: () => void;
 
@@ -21,6 +30,17 @@ export class MainGame extends Scene {
     super("MainGame");
   }
   create() {
+    //username
+    const text = this.add.text(
+      this.cameras.main.centerX,
+      this.cameras.main.centerY,
+      this.userName,
+      {
+        fontSize: "24px",
+        color: "#ffffff",
+      }
+    );
+    text.setDepth(10);
     //bg
     this.background = this.add.image(
       this.cameras.main.centerX,
