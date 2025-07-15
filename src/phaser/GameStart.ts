@@ -31,7 +31,7 @@ export const GameStart = (
           y: 0,
           x: 0,
         },
-        debug: false,
+        debug: true,
       },
     },
     plugins: {

@@ -7,9 +7,11 @@ export class MainGame extends Scene {
 
   // member
   background!: Phaser.GameObjects.Image;
-  player!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+  playerSprite!: Phaser.GameObjects.Sprite;
+  usernameText!: Phaser.GameObjects.Text;
+  playerContainer!: Phaser.GameObjects.Container;
   playerSpeed = 100;
-  playerSize = 5;
+  playerSize = 0.7;
   cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   spaceBar!: Phaser.Input.Keyboard.Key;
   pcObj!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
@@ -20,7 +22,6 @@ export class MainGame extends Scene {
   //userDataSetter
   setUserData(userData: UserData) {
     this.userName = userData.user_name;
-    console.log("userData受け取った:", userData);
   }
 
   // method from react
@@ -30,17 +31,6 @@ export class MainGame extends Scene {
     super("MainGame");
   }
   create() {
-    //username
-    const text = this.add.text(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY,
-      this.userName,
-      {
-        fontSize: "24px",
-        color: "#ffffff",
-      }
-    );
-    text.setDepth(10);
     //bg
     this.background = this.add.image(
       this.cameras.main.centerX,
@@ -55,14 +45,39 @@ export class MainGame extends Scene {
     this.background.setScale(scale);
 
     //player
-    this.player = this.physics.add.sprite(
-      this.cameras.main.centerX + 60,
-      this.cameras.main.centerY + 160,
-      "mendako"
+    this.playerSprite = this.add.sprite(0, 0, "mendako");
+    const playerScaleX = this.cameras.main.width / 5 / this.playerSprite.width;
+    this.playerSprite.setScale(playerScaleX);
+
+    //username
+    this.usernameText = this.add
+      .text(0, -70, this.userName, {
+        fontSize: "24px",
+        color: "#ffffff",
+      })
+      .setOrigin(0.5);
+    this.usernameText.setDepth(10);
+
+    //player + username をコンテナでまとめる
+    this.playerContainer = this.add.container(0, 0, [
+      this.playerSprite,
+      this.usernameText,
+    ]);
+    this.physics.world.enable(this.playerContainer);
+    const playerBody = this.playerContainer.body as Phaser.Physics.Arcade.Body;
+    playerBody.setSize(
+      this.playerSprite.displayWidth * this.playerSize,
+      this.playerSprite.displayHeight * this.playerSize
     );
-    const playerScaleX =
-      this.cameras.main.width / this.playerSize / this.player.width;
-    this.player.setScale(playerScaleX);
+    playerBody.setOffset(
+      (-this.playerSprite.displayWidth * this.playerSize) / 2,
+      (-this.playerSprite.displayHeight * this.playerSize) / 2
+    );
+    this.playerContainer.setPosition(
+      this.cameras.main.centerX + 70,
+      this.cameras.main.centerY + 160
+    );
+    playerBody.setCollideWorldBounds(true);
 
     //keyboard
     this.cursors = this.input.keyboard!.createCursorKeys();
@@ -88,7 +103,7 @@ export class MainGame extends Scene {
     this.promptDecide.setVisible(false);
 
     //overlap
-    this.physics.add.overlap(this.player, this.pcObj, () => {
+    this.physics.add.overlap(this.playerContainer, this.pcObj, () => {
       if (!this.promptDecide.visible) {
         this.promptDecide.setVisible(true);
       }
@@ -97,19 +112,20 @@ export class MainGame extends Scene {
     });
   }
   update() {
+    const player = this.playerContainer.body as Phaser.Physics.Arcade.Body;
     if (this.cursors.right.isDown) {
-      this.player.setVelocityX(this.playerSpeed);
+      player.setVelocityX(this.playerSpeed);
     } else if (this.cursors.left.isDown) {
-      this.player.setVelocityX(-1 * this.playerSpeed);
+      player.setVelocityX(-1 * this.playerSpeed);
     } else {
-      this.player.setVelocityX(0);
+      player.setVelocityX(0);
     }
     if (this.cursors.down.isDown) {
-      this.player.setVelocityY(this.playerSpeed);
+      player.setVelocityY(this.playerSpeed);
     } else if (this.cursors.up.isDown) {
-      this.player.setVelocityY(-1 * this.playerSpeed);
+      player.setVelocityY(-1 * this.playerSpeed);
     } else {
-      this.player.setVelocityY(0);
+      player.setVelocityY(0);
     }
     if (Phaser.Input.Keyboard.JustDown(this.spaceBar) && this.isOverlapping) {
       if (this.toggleShowGallery) {

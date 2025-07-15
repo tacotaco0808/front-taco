@@ -8,6 +8,7 @@ import axios from "axios";
 import type { UserData } from "../phaser/types/PhaserTypes";
 export const Home = () => {
   const [isVisbleGallery, setIsVisibleGallery] = useState(false);
+  const [isVisiblePhaser, setIsVisiblePhaser] = useState(false);
   const [userData, setUserData] = useState<UserData | null>();
   const handleSetSceneFunc = (scene: Phaser.Scene) => {
     (scene as MainGame).toggleShowGallery = () => {
@@ -16,11 +17,16 @@ export const Home = () => {
   };
   useEffect(() => {
     const get_me = async () => {
-      const res = await axios.get(`${import.meta.env.VITE_IMAGE_API}/me`, {
-        withCredentials: true,
-      });
-      const resData = res.data;
-      setUserData(resData);
+      try {
+        const res = await axios.get(`${import.meta.env.VITE_IMAGE_API}/me`, {
+          withCredentials: true,
+        });
+        const resData = res.data;
+        setUserData(resData);
+      } catch (error) {
+        console.log(error);
+      }
+      setIsVisiblePhaser(true);
     };
     get_me();
   }, []);
@@ -28,7 +34,7 @@ export const Home = () => {
     <div>
       {userData && <div>{userData.user_name}</div>}
       <div className={styles.mv_wrapper}>
-        {userData && (
+        {isVisiblePhaser && (
           <PhaserGame setSceneFunc={handleSetSceneFunc} userData={userData} />
         )}
 
