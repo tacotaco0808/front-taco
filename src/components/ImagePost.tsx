@@ -18,6 +18,14 @@ export const ImagePost = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageFilePreview, setImageFilePreview] = useState<string | null>(null);
   const [errorStr, setErrorStr] = useState<string | null>(null);
+  const handleClearForm = () => {
+    setImageTitle(null);
+    setImageDetail(null);
+    setImageFile(null);
+    setImageFilePreview(null);
+    setErrorStr(null);
+  };
+
   const handleSubmit = async () => {
     if (!imageTitle || !imageDetail || !imageFile) {
       return;
@@ -96,6 +104,9 @@ export const ImagePost = () => {
           onClick={handleSubmit}
         >
           画像をアップロードする
+        </Button>
+        <Button variant="outlined" color="secondary" onClick={handleClearForm}>
+          フォームをクリア
         </Button>
       </Box>
     </>
