@@ -52,10 +52,19 @@ export const Home = () => {
             <div className={styles.pc_window}>
               <img src={WindowBar} />
               <SearchImages />
-              <Button component={Link} to="/image/post" variant="contained">
+              <Button
+                component={Link}
+                to="/image/post"
+                variant="contained"
+                disabled={!userData}
+              >
                 画像の投稿をする
               </Button>
-              <p>画像の投稿にはログインが必要です。</p>
+              {userData ? (
+                <div>ユーザ：{userData.user_name}でログインしています</div>
+              ) : (
+                <p>画像の投稿にはログインが必要です。</p>
+              )}
             </div>
           </div>
         )}
