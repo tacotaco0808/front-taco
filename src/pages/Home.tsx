@@ -6,6 +6,8 @@ import type { MainGame } from "../phaser/scenes/MainGame";
 import { SearchImages } from "../components/SearchImages";
 import axios from "axios";
 import type { UserData } from "../phaser/types/PhaserTypes";
+import { Link } from "react-router";
+import { Button } from "@mui/material";
 export const Home = () => {
   const [isVisbleGallery, setIsVisibleGallery] = useState(false);
   const [isVisiblePhaser, setIsVisiblePhaser] = useState(false);
@@ -50,6 +52,10 @@ export const Home = () => {
             <div className={styles.pc_window}>
               <img src={WindowBar} />
               <SearchImages />
+              <Button component={Link} to="/image/post" variant="contained">
+                画像の投稿をする
+              </Button>
+              <p>画像の投稿にはログインが必要です。</p>
             </div>
           </div>
         )}

@@ -11,6 +11,12 @@ export const PhaserGame = ({ setSceneFunc, userData }: Props) => {
     if (gameRef.current === null) {
       gameRef.current = GameStart("game-container", setSceneFunc, userData);
     }
+    return () => {
+      if (gameRef.current) {
+        gameRef.current.destroy(true);
+        gameRef.current = null;
+      }
+    };
   }, []);
   return <div id="game-container"></div>;
 };
