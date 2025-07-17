@@ -17,7 +17,7 @@ export class MainGame extends Scene {
   pcObj!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
   pcObjSize = 7;
   isOverlapping = false;
-  promptDecide!: SpineGameObject;
+  promptDecide!: SpineGameObject | Phaser.GameObjects.Sprite;
 
   //userDataSetter
   setUserData(userData: UserData) {
@@ -97,8 +97,18 @@ export class MainGame extends Scene {
     this.pcObj.setVisible(false);
 
     //promptDecide
-    this.promptDecide = this.add.spine(250, 300, "prompt-data", "prompt-atlas");
-    this.promptDecide.animationState.setAnimation(0, "animation", true);
+    if (this.spine && typeof this.add.spine === "function") {
+      this.promptDecide = this.add.spine(
+        250,
+        300,
+        "prompt-data",
+        "prompt-atlas"
+      );
+      this.promptDecide.animationState.setAnimation(0, "animation", true);
+    } else {
+      console.log("spineプラグインが読み込まれていません");
+      this.promptDecide = this.add.sprite(0, 0, "prompt-sub");
+    }
     this.promptDecide.setScale(this.cameras.main.width / 20 / this.pcObj.width);
     this.promptDecide.setVisible(false);
 
