@@ -3,12 +3,17 @@ import { Boot } from "./scenes/Boot";
 import { Preloader } from "./scenes/Preloader";
 import { MainGame } from "./scenes/MainGame";
 import { SpinePlugin } from "@esotericsoftware/spine-phaser-v3";
+import type { UserData } from "./types/PhaserTypes";
 
 export const GameStart = (
   parent: string,
-  setSceneFunc?: (scene: Phaser.Scene) => void
+  setSceneFunc?: (scene: Phaser.Scene) => void,
+  userData?: UserData | null
 ) => {
   const mainGame = new MainGame();
+  if (userData) {
+    mainGame.setUserData(userData);
+  }
   if (setSceneFunc) {
     setSceneFunc(mainGame);
   }

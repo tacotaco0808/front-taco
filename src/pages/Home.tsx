@@ -1,24 +1,45 @@
 import styles from "./Home.module.scss";
 import WindowBar from "/assets/window_bar.png";
 import { PhaserGame } from "../components/PhaserGame";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { MainGame } from "../phaser/scenes/MainGame";
 import { SearchImages } from "../components/SearchImages";
+import axios from "axios";
+import type { UserData } from "../phaser/types/PhaserTypes";
+import { Link } from "react-router";
+import { Button } from "@mui/material";
 export const Home = () => {
   const [isVisbleGallery, setIsVisibleGallery] = useState(false);
+  const [isVisiblePhaser, setIsVisiblePhaser] = useState(false);
+  const [userData, setUserData] = useState<UserData | null>();
   const handleSetSceneFunc = (scene: Phaser.Scene) => {
     (scene as MainGame).toggleShowGallery = () => {
       setIsVisibleGallery((prev) => !prev);
     };
   };
+  useEffect(() => {
+    const get_me = async () => {
+      try {
+        const res = await axios.get(`${import.meta.env.VITE_IMAGE_API}/me`, {
+          withCredentials: true,
+        });
+        const resData = res.data;
+        setUserData(resData);
+      } catch (error) {
+        console.log(error);
+      }
+      setIsVisiblePhaser(true);
+    };
+    get_me();
+  }, []);
   return (
     <div>
+      {userData && <div>{userData.user_name}</div>}
       <div className={styles.mv_wrapper}>
-        {/* <img className={styles.mv_background} src={HomeBackground} alt="" />
-        <div className={styles.gallery_wrapper}>
-          <ImagesList />
-        </div> */}
-        <PhaserGame setSceneFunc={handleSetSceneFunc} />
+        {isVisiblePhaser && (
+          <PhaserGame setSceneFunc={handleSetSceneFunc} userData={userData} />
+        )}
+
         <p>
           カーソル（←↑→↓）で動かしてみよう <br />
           スペースで決定 <br />
@@ -31,6 +52,19 @@ export const Home = () => {
             <div className={styles.pc_window}>
               <img src={WindowBar} />
               <SearchImages />
+              <Button
+                component={Link}
+                to="/image/post"
+                variant="contained"
+                disabled={!userData}
+              >
+                画像の投稿をする
+              </Button>
+              {userData ? (
+                <div>ユーザ：{userData.user_name}でログインしています</div>
+              ) : (
+                <p>画像の投稿にはログインが必要です。</p>
+              )}
             </div>
           </div>
         )}

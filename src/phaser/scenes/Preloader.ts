@@ -11,6 +11,7 @@ export class Preloader extends Scene {
     this.load.setPath("assets");
     this.load.image("mendako", "dot_mendako.png");
     this.load.image("pc-obj", "dot_mendako.png");
+    this.load.image("prompt-sub", "skeleton.png");
     this.load.spineBinary("prompt-data", "skeleton.skel");
     this.load.spineAtlas("prompt-atlas", "skeleton.atlas");
 
