@@ -2,7 +2,7 @@ import styles from "./Home.module.scss";
 import WindowBar from "/assets/window_bar.png";
 import { PhaserGame } from "../components/PhaserGame";
 import { useEffect, useState } from "react";
-import type { MainGame } from "../phaser/scenes/MainGame";
+import type { HomeGame } from "../phaser/scenes/HomeGame";
 import { SearchImages } from "../components/SearchImages";
 import axios from "axios";
 import type { UserData } from "../phaser/types/PhaserTypes";
@@ -13,7 +13,7 @@ export const Home = () => {
   const [isVisiblePhaser, setIsVisiblePhaser] = useState(false);
   const [userData, setUserData] = useState<UserData | null>();
   const handleSetSceneFunc = (scene: Phaser.Scene) => {
-    (scene as MainGame).toggleShowGallery = () => {
+    (scene as HomeGame).toggleShowGallery = () => {
       setIsVisibleGallery((prev) => !prev);
     };
   };
@@ -37,7 +37,11 @@ export const Home = () => {
       {userData && <div>{userData.user_name}</div>}
       <div className={styles.mv_wrapper}>
         {isVisiblePhaser && (
-          <PhaserGame setSceneFunc={handleSetSceneFunc} userData={userData} />
+          <PhaserGame
+            sceneName="home"
+            setSceneFunc={handleSetSceneFunc}
+            userData={userData}
+          />
         )}
 
         <p>
