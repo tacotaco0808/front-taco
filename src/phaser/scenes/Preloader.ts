@@ -27,7 +27,7 @@ export class Preloader extends Scene {
       if (scene === "home") {
         this.scene.start("HomeGame", { userData, setSceneFunc });
       } else if (scene === "park") {
-        this.scene.start("ParkGame", { userData });
+        this.scene.start("ParkGame", { userData, setSceneFunc });
       }
     });
   }

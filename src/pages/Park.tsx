@@ -1,10 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { UserData } from "../phaser/types/PhaserTypes";
 import { fetchUserData } from "../func/fetchUserData";
 import { v4 as uuidv4, v4 } from "uuid";
 import { PhaserGame } from "../components/PhaserGame";
+import { WsEventHandler } from "../func/wsEventHandler";
 export const Park = () => {
   const [userData, setUserData] = useState<UserData | null>();
+  const [scene, setScene] = useState<Phaser.Scene | null>();
+  const wsEventHandler = useRef<WsEventHandler>(new WsEventHandler()).current;
   useEffect(() => {
     const getMe = async () => {
       const me = await fetchUserData();
@@ -15,6 +18,11 @@ export const Park = () => {
     getMe();
   }, []);
   useEffect(() => {
+    if (scene) {
+      wsEventHandler.setScene(scene);
+    }
+  }, [scene]);
+  useEffect(() => {
     if (!userData) return;
     const userDataMock = uuidv4();
     const ws = new WebSocket(`ws://localhost:8000/ws/` + userData.user_id);
@@ -22,8 +30,10 @@ export const Park = () => {
       ws.send("接続完了");
     };
     ws.onmessage = (event) => {
-      JSON.parse(event.data);
-      console.log("data:" + event.data);
+      if (!setScene) return;
+      const data = JSON.parse(event.data);
+      wsEventHandler.handle(data);
+      console.log(data);
     };
     //parkシーンを表示 GameStart.tsでシーンを変更できるようにする。
     //
@@ -37,7 +47,13 @@ export const Park = () => {
   }, [userData]);
   return (
     <>
-      <PhaserGame sceneName="park" userData={userData} />
+      {userData && (
+        <PhaserGame
+          sceneName="park"
+          userData={userData}
+          setSceneFunc={setScene}
+        />
+      )}
     </>
   );
 };

@@ -4,7 +4,7 @@ import { Preloader } from "./scenes/Preloader";
 import { HomeGame } from "./scenes/HomeGame";
 import { SpinePlugin } from "@esotericsoftware/spine-phaser-v3";
 import type { UserData } from "./types/PhaserTypes";
-import { ParkGame } from "./scenes/Parkgame";
+import { ParkGame } from "./scenes/ParkGame";
 type SceneName = "home" | "park";
 export const GameStart = (
   parent: string,
