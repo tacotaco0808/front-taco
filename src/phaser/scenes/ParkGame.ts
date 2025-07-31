@@ -9,11 +9,21 @@ export class ParkGame extends Scene {
   playerSprite!: Phaser.GameObjects.Sprite;
   cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   playerManager: PlayerManager = new PlayerManager();
+  playerSpeed = 100;
   wsEventHandler!: WsEventHandler;
-  private wasRightDown = false;
-  private cnt = 0;
+  usernameText!: Phaser.GameObjects.Text;
+
+  playerContainer!: Phaser.GameObjects.Container;
+  playerSize = 0.7;
+
   constructor() {
-    super("ParkGame");
+    super({
+      key: "ParkGame",
+      physics: {
+        default: "arcade",
+        arcade: { debug: true, gravity: { x: 0, y: 300 } },
+      },
+    });
   }
   //userDataSetter
   setUserData(userData: UserData) {
@@ -44,27 +54,63 @@ export class ParkGame extends Scene {
     const playerScaleX = this.cameras.main.width / 5 / this.playerSprite.width;
     this.playerSprite.setScale(playerScaleX);
 
+    //username
+    this.usernameText = this.add
+      .text(0, -70, this.userName, {
+        fontSize: "24px",
+        color: "#ffffff",
+      })
+      .setOrigin(0.5);
+    this.usernameText.setDepth(10);
+
+    //player + username をコンテナでまとめる
+    this.playerContainer = this.add.container(0, 0, [
+      this.playerSprite,
+      this.usernameText,
+    ]);
+    this.physics.world.enable(this.playerContainer);
+    const playerBody = this.playerContainer.body as Phaser.Physics.Arcade.Body;
+    playerBody.setSize(
+      this.playerSprite.displayWidth * this.playerSize,
+      this.playerSprite.displayHeight * this.playerSize
+    );
+    playerBody.setOffset(
+      (-this.playerSprite.displayWidth * this.playerSize) / 2,
+      (-this.playerSprite.displayHeight * this.playerSize) / 2
+    );
+    this.playerContainer.setPosition(
+      this.cameras.main.centerX + 70,
+      this.cameras.main.centerY + 160
+    );
+    playerBody.setCollideWorldBounds(true);
     //cursor
     this.cursors = this.input.keyboard!.createCursorKeys();
 
     //event
     this.events.on("remoteCommand", (data) => {
       if (data.type === "login") {
-        this.playerManager.addPlayer(data.player_id, this.cnt + 50, 100, this);
-        this.cnt += 50;
+        this.playerManager.addPlayer(data.player_id, 100, 100, this);
       }
       if (data.type === "logout") {
         this.playerManager.removePlayer(data.player_id);
-        this.cnt += 50;
       }
     });
   }
   update() {
-    const isDown = this.cursors.right.isDown;
-    if (isDown && !this.wasRightDown) {
-      // this.playerManager.addPlayer(String(this.cnt), this.cnt + 50, 100, this);
-      // 押された瞬間だけ実行
+    const player = this.playerContainer.body as Phaser.Physics.Arcade.Body;
+    if (this.cursors.right.isDown) {
+      player.setVelocityX(this.playerSpeed);
+    } else if (this.cursors.left.isDown) {
+      player.setVelocityX(-1 * this.playerSpeed);
+    } else {
+      player.setVelocityX(0);
     }
-    this.wasRightDown = isDown;
+    if (this.cursors.down.isDown) {
+      player.setVelocityY(this.playerSpeed);
+    } else if (this.cursors.up.isDown) {
+      player.setVelocityY(-1 * this.playerSpeed);
+    } else {
+      // player.setVelocityY(0);
+    }
   }
 }
