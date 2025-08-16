@@ -98,7 +98,7 @@ export class ParkGame extends Scene {
 
     //定期イベント
     this.time.addEvent({
-      delay: 5000,
+      delay: 1000,
       loop: true,
       callback: () => {
         // ここにonPositionUpdate

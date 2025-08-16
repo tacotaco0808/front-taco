@@ -4,16 +4,32 @@ import { fetchUserData } from "../func/fetchUserData";
 // import { v4 as uuidv4, v4 } from "uuid";
 import { PhaserGame } from "../components/PhaserGame";
 import { WsEventHandler } from "../func/wsEventHandler";
+type UserPosition = {
+  x: number;
+  y: number;
+};
 export const Park = () => {
   const [userData, setUserData] = useState<UserData | null>();
   const [scene, setScene] = useState<Phaser.Scene | null>();
   const wsEventHandler = useRef<WsEventHandler>(new WsEventHandler()).current;
   const [eventQueue, setEventQueue] = useState<any[]>([]);
+  const phaserUserPositionRef = useRef<UserPosition>({ x: 0, y: 0 });
+  const wsRef = useRef<WebSocket | null>(null);
   const handleSetSceneFunc = (scene: Phaser.Scene) => {
     setScene(scene);
   };
   const handlePositionUpdate = (x: number, y: number) => {
     console.log("phaserからの座標", x, y);
+    phaserUserPositionRef.current = { x: x, y: y };
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(
+        JSON.stringify({
+          event: "position",
+          player_id: userData?.user_id,
+          content: phaserUserPositionRef,
+        })
+      );
+    }
   };
   useEffect(() => {
     const getMe = async () => {
@@ -36,28 +52,13 @@ export const Park = () => {
       }
     }
   }, [scene, eventQueue]);
-  // useEffect(() => {
-  //   console.log("test");
-  // }, [eventQueue]);
+
   useEffect(() => {
     if (!userData) return;
-    console.log("aiuei");
     const ws = new WebSocket(`ws://localhost:8000/ws/` + userData.user_id);
+    wsRef.current = ws;
     ws.onopen = () => {
       ws.send("接続完了");
-      const interval = setInterval(() => {
-        console.log("interval");
-        ws.send(
-          JSON.stringify({
-            event: "position",
-            player_id: userData.user_id,
-            content: { x: 100, y: 100 },
-          })
-        );
-      }, 5000);
-      ws.onclose = () => {
-        clearInterval(interval);
-      };
     };
     ws.onmessage = (event) => {
       try {
@@ -67,6 +68,10 @@ export const Park = () => {
       } catch (error) {
         console.log(event.data);
       }
+    };
+    return () => {
+      ws.close();
+      wsRef.current = null;
     };
   }, [userData]);
   return (
