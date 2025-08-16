@@ -9,6 +9,12 @@ export const Park = () => {
   const [scene, setScene] = useState<Phaser.Scene | null>();
   const wsEventHandler = useRef<WsEventHandler>(new WsEventHandler()).current;
   const [eventQueue, setEventQueue] = useState<any[]>([]);
+  const handleSetSceneFunc = (scene: Phaser.Scene) => {
+    setScene(scene);
+  };
+  const handlePositionUpdate = (x: number, y: number) => {
+    console.log("phaserからの座標", x, y);
+  };
   useEffect(() => {
     const getMe = async () => {
       const me = await fetchUserData();
@@ -39,6 +45,19 @@ export const Park = () => {
     const ws = new WebSocket(`ws://localhost:8000/ws/` + userData.user_id);
     ws.onopen = () => {
       ws.send("接続完了");
+      const interval = setInterval(() => {
+        console.log("interval");
+        ws.send(
+          JSON.stringify({
+            event: "position",
+            player_id: userData.user_id,
+            content: { x: 100, y: 100 },
+          })
+        );
+      }, 5000);
+      ws.onclose = () => {
+        clearInterval(interval);
+      };
     };
     ws.onmessage = (event) => {
       try {
@@ -56,7 +75,10 @@ export const Park = () => {
         <PhaserGame
           sceneName="park"
           userData={userData}
-          setSceneFunc={setScene}
+          sceneCallBacks={{
+            setSceneFunc: handleSetSceneFunc,
+            onPositionUpdate: handlePositionUpdate,
+          }}
         />
       )}
     </>

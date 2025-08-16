@@ -15,14 +15,16 @@ export class ParkGame extends Scene {
 
   playerContainer!: Phaser.GameObjects.Container;
   playerSize = 0.7;
+  //コールバック関数
+  onPositionUpdate?: (x: number, y: number) => void;
 
   constructor() {
     super({
       key: "ParkGame",
-      physics: {
-        default: "arcade",
-        arcade: { debug: true, gravity: { x: 0, y: 300 } },
-      },
+      // physics: {
+      //   default: "arcade",
+      //   arcade: { debug: true, gravity: { x: 0, y: 300 } },
+      // },
     });
   }
   //userDataSetter
@@ -31,10 +33,18 @@ export class ParkGame extends Scene {
   }
   create(data?: {
     userData?: UserData;
-    setSceneFunc?: (scene: Phaser.Scene) => void;
+    sceneCallBacks?: {
+      setSceneFunc?: (scene: Phaser.Scene) => void;
+      onPositionUpdate?: (x: number, y: number) => void;
+      // 他のコールバックも追加可能
+    };
   }) {
-    if (data?.setSceneFunc) {
-      data.setSceneFunc(this); // ← Park.tsxのsetSceneにParkGameインスタンスを渡す
+    //コールバックの処理
+    if (data?.sceneCallBacks?.setSceneFunc) {
+      data.sceneCallBacks.setSceneFunc(this); // ← Park.tsxのsetSceneにParkGameインスタンスを渡す
+    }
+    if (data?.sceneCallBacks?.onPositionUpdate) {
+      this.onPositionUpdate = data.sceneCallBacks.onPositionUpdate;
     }
     //bg
     this.background = this.add.image(
@@ -86,6 +96,18 @@ export class ParkGame extends Scene {
     //cursor
     this.cursors = this.input.keyboard!.createCursorKeys();
 
+    //定期イベント
+    this.time.addEvent({
+      delay: 5000,
+      loop: true,
+      callback: () => {
+        // ここにonPositionUpdate
+        if (this.onPositionUpdate) {
+          this.onPositionUpdate(this.playerContainer.x, this.playerContainer.y);
+        }
+      },
+    });
+
     //event
     this.events.on("remoteCommand", (data) => {
       if (data.type === "login") {
@@ -110,7 +132,7 @@ export class ParkGame extends Scene {
     } else if (this.cursors.up.isDown) {
       player.setVelocityY(-1 * this.playerSpeed);
     } else {
-      // player.setVelocityY(0);
+      player.setVelocityY(0);
     }
   }
 }

@@ -6,10 +6,14 @@ import { SpinePlugin } from "@esotericsoftware/spine-phaser-v3";
 import type { UserData } from "./types/PhaserTypes";
 import { ParkGame } from "./scenes/ParkGame";
 type SceneName = "home" | "park";
+type SceneCallBacks = {
+  setSceneFunc?: (scene: Phaser.Scene) => void;
+  onPositionUpdate?: (x: number, y: number) => void;
+};
 export const GameStart = (
   parent: string,
   scene: SceneName,
-  setSceneFunc?: (scene: Phaser.Scene) => void,
+  sceneCallBacks?: SceneCallBacks,
   userData?: UserData | null
 ) => {
   // if (userData) {
@@ -46,6 +50,6 @@ export const GameStart = (
     },
   };
   const game = new Game(config);
-  game.scene.start("Boot", { scene, setSceneFunc, userData });
+  game.scene.start("Boot", { scene, sceneCallBacks, userData });
   return game;
 };

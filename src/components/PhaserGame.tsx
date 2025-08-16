@@ -1,20 +1,24 @@
 import { useLayoutEffect, useRef } from "react";
 import { GameStart } from "../phaser/GameStart";
 import type { UserData } from "../phaser/types/PhaserTypes";
+type SceneCallBacks = {
+  setSceneFunc?: (scene: Phaser.Scene) => void;
+  onPositionUpdate?: (x: number, y: number) => void;
+};
 type Props = {
   sceneName: SceneName;
-  setSceneFunc?: (scene: Phaser.Scene) => void;
+  sceneCallBacks: SceneCallBacks;
   userData?: UserData | null;
 };
 type SceneName = "home" | "park";
-export const PhaserGame = ({ sceneName, setSceneFunc, userData }: Props) => {
+export const PhaserGame = ({ sceneName, sceneCallBacks, userData }: Props) => {
   const gameRef = useRef<Phaser.Game | null>(null);
   useLayoutEffect(() => {
     if (gameRef.current === null) {
       gameRef.current = GameStart(
         "game-container",
         sceneName,
-        setSceneFunc,
+        sceneCallBacks,
         userData
       );
     }

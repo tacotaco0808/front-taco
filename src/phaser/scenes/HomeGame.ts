@@ -32,13 +32,17 @@ export class HomeGame extends Scene {
   }
   create(data?: {
     userData?: UserData;
-    setSceneFunc?: (scene: Phaser.Scene) => void;
+    sceneCallBacks?: {
+      setSceneFunc?: (scene: Phaser.Scene) => void;
+      onPositionUpdate?: (x: number, y: number) => void;
+      // 他のコールバックも追加可能
+    };
   }) {
     if (data?.userData) {
       this.setUserData(data.userData);
     }
-    if (data?.setSceneFunc) {
-      data.setSceneFunc(this);
+    if (data?.sceneCallBacks?.setSceneFunc) {
+      data.sceneCallBacks.setSceneFunc(this);
     }
     //bg
     this.background = this.add.image(

@@ -39,7 +39,9 @@ export const Home = () => {
         {isVisiblePhaser && (
           <PhaserGame
             sceneName="home"
-            setSceneFunc={handleSetSceneFunc}
+            sceneCallBacks={{
+              setSceneFunc: handleSetSceneFunc,
+            }}
             userData={userData}
           />
         )}
