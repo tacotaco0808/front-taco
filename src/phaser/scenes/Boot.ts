@@ -7,7 +7,7 @@ export class Boot extends Scene {
   preload() {
     this.load.image("mendako-home-bg", "/assets/ドット部屋.png");
     this.load.on("complete", () => {
-      this.scene.start("Preloader");
+      this.scene.start("Preloader", this.scene.settings.data);
     });
   }
 }
