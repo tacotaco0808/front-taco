@@ -1,6 +1,7 @@
 export type EventData = {
   event: string;
   player_id: string;
+  content?: { current: { x: number; y: number } };
 };
 
 export class WsEventHandler {
@@ -12,32 +13,24 @@ export class WsEventHandler {
   }
 
   handle(data: EventData) {
-    const handlers: Record<string, (data: EventData) => void> = {
-      login: this.handleLogin.bind(this),
-      logout: this.handleLogout.bind(this),
-    };
-    const handle = handlers[data.event];
-    if (handle) {
-      handle(data);
-    } else {
-      console.warn("未定義のイベント:", data.event);
-    }
-  }
-  private handleLogin(data: EventData) {
     if (!this.scene) return;
-    console.log("login受信" + data.player_id);
-    this.scene.events.emit("remoteCommand", {
-      type: "login",
-      player_id: data.player_id,
-    });
-    // ここでイベント送信
+    this.scene.events.emit(data.event, data);
   }
-  private handleLogout(data: EventData) {
-    if (!this.scene) return;
-    console.log("logout受信" + data.player_id);
-    this.scene.events.emit("remoteCommand", {
-      type: "logout",
-      player_id: data.player_id,
-    });
-  }
+  // private handleLogin(data: EventData) {
+  //   if (!this.scene) return;
+  //   console.log("login受信" + data.player_id);
+  //   this.scene.events.emit("remoteCommand", {
+  //     type: "login",
+  //     player_id: data.player_id,
+  //   });
+  //   // ここでイベント送信
+  // }
+  // private handleLogout(data: EventData) {
+  //   if (!this.scene) return;
+  //   console.log("logout受信" + data.player_id);
+  //   this.scene.events.emit("remoteCommand", {
+  //     type: "logout",
+  //     player_id: data.player_id,
+  //   });
+  // }
 }

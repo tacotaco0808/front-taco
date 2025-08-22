@@ -18,8 +18,8 @@ export const Park = () => {
   const handleSetSceneFunc = (scene: Phaser.Scene) => {
     setScene(scene);
   };
+  // ゲーム内の自分の座標を取得し、サーバへ送信
   const handlePositionUpdate = (x: number, y: number) => {
-    console.log("phaserからの座標", x, y);
     phaserUserPositionRef.current = { x: x, y: y };
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(
@@ -41,10 +41,10 @@ export const Park = () => {
     getMe();
   }, []);
   useEffect(() => {
+    //　シーンを準備後、受信したイベントを処理する
     if (scene) {
       wsEventHandler.setScene(scene);
       if (eventQueue.length > 0) {
-        console.log("こいつら実行" + eventQueue);
         eventQueue.forEach((data) => {
           wsEventHandler.handle(data);
         });

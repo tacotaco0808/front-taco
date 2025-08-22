@@ -1,7 +1,9 @@
 export class PlayerManager {
+  //Playerが管理されている
+  //Player.playerContainerが実質てきなプレイヤーの実態
   private players: Record<string, Player> = {};
   addPlayer(
-    key: string,
+    key: string, // player_id
     // username: string,
     x: number,
     y: number,
