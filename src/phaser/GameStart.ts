@@ -1,29 +1,34 @@
 import { AUTO, Game } from "phaser";
 import { Boot } from "./scenes/Boot";
 import { Preloader } from "./scenes/Preloader";
-import { MainGame } from "./scenes/MainGame";
+import { HomeGame } from "./scenes/HomeGame";
 import { SpinePlugin } from "@esotericsoftware/spine-phaser-v3";
 import type { UserData } from "./types/PhaserTypes";
-
+import { ParkGame } from "./scenes/ParkGame";
+type SceneName = "home" | "park";
+type SceneCallBacks = {
+  setSceneFunc?: (scene: Phaser.Scene) => void;
+  onPositionUpdate?: (x: number, y: number) => void;
+};
 export const GameStart = (
   parent: string,
-  setSceneFunc?: (scene: Phaser.Scene) => void,
+  scene: SceneName,
+  sceneCallBacks?: SceneCallBacks,
   userData?: UserData | null
 ) => {
-  const mainGame = new MainGame();
-  if (userData) {
-    mainGame.setUserData(userData);
-  }
-  if (setSceneFunc) {
-    setSceneFunc(mainGame);
-  }
+  // if (userData) {
+  //   mainGame.setUserData(userData);
+  // }
+  // if (setSceneFunc) {
+  //   setSceneFunc(mainGame);
+  // }
   const config: Phaser.Types.Core.GameConfig = {
     type: AUTO,
     width: 500,
     height: 500,
     parent: parent,
     backgroundColor: "#028af8",
-    scene: [Boot, Preloader, mainGame],
+    scene: [Boot, Preloader, HomeGame, ParkGame],
     physics: {
       default: "arcade",
       arcade: {
@@ -44,5 +49,7 @@ export const GameStart = (
       ],
     },
   };
-  return new Game(config);
+  const game = new Game(config);
+  game.scene.start("Boot", { scene, sceneCallBacks, userData });
+  return game;
 };

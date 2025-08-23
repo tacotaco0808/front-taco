@@ -1,5 +1,12 @@
 import { Scene } from "phaser";
 
+type PreloaderSceneData = {
+  userData?: any;
+  // setSceneFunc?: any;
+  sceneCallBacks?: any;
+  scene: string;
+};
+
 export class Preloader extends Scene {
   constructor() {
     super("Preloader");
@@ -16,7 +23,13 @@ export class Preloader extends Scene {
     this.load.spineAtlas("prompt-atlas", "skeleton.atlas");
 
     this.load.on("complete", () => {
-      this.scene.start("MainGame");
+      const { userData, sceneCallBacks, scene } =
+        (this.scene.settings.data as PreloaderSceneData) || {};
+      if (scene === "home") {
+        this.scene.start("HomeGame", { userData, sceneCallBacks });
+      } else if (scene === "park") {
+        this.scene.start("ParkGame", { userData, sceneCallBacks });
+      }
     });
   }
 }

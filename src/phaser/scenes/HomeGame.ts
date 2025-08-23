@@ -1,7 +1,7 @@
 import type { SpineGameObject } from "@esotericsoftware/spine-phaser-v3";
 import { Scene } from "phaser";
 import type { UserData } from "../types/PhaserTypes";
-export class MainGame extends Scene {
+export class HomeGame extends Scene {
   // ログイン情報から取得したデータ
   userName: string = "Guest";
 
@@ -28,9 +28,22 @@ export class MainGame extends Scene {
   toggleShowGallery?: () => void;
 
   constructor() {
-    super("MainGame");
+    super("HomeGame");
   }
-  create() {
+  create(data?: {
+    userData?: UserData;
+    sceneCallBacks?: {
+      setSceneFunc?: (scene: Phaser.Scene) => void;
+      onPositionUpdate?: (x: number, y: number) => void;
+      // 他のコールバックも追加可能
+    };
+  }) {
+    if (data?.userData) {
+      this.setUserData(data.userData);
+    }
+    if (data?.sceneCallBacks?.setSceneFunc) {
+      data.sceneCallBacks.setSceneFunc(this);
+    }
     //bg
     this.background = this.add.image(
       this.cameras.main.centerX,
