@@ -3,27 +3,32 @@ name: Deploy Frontend
 on:
   push:
     branches:
-      - main   # mainにpushされたときだけ
+      - main   # main に push されたときだけ実行
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. ソースコードを取得
       - name: Checkout
         uses: actions/checkout@v4
 
+      # 2. Node.js セットアップ
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
+      # 3. 依存関係インストール
       - name: Install dependencies
         run: npm ci
 
+      # 4. ビルド
       - name: Build
-        run: npm run build   # vite build → dist/ に出力
-        
+        run: npm run build   # vite build → dist/ に出力される想定
+
+      # 5. 旧アプリをバックアップ（必要なら）
       - name: Backup existing my_app on VPS
         uses: appleboy/ssh-action@v0.1.7
         with:
@@ -35,12 +40,26 @@ jobs:
               sudo rm -rf /var/www/my_app_prev_backup
               sudo mv /var/www/my_app /var/www/my_app_prev_backup
             fi
-            
-      - name: Deploy to VPS
+
+      # 6. ビルド成果物を一時ディレクトリへアップロード
+      - name: Upload build files to tmp
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           source: "dist/*"
-          target: "/var/www/my_app"
+          target: "~/upload_tmp"
+
+      # 7. 一時ディレクトリから /var/www/my_app へ移動
+      - name: Move files into /var/www/my_app
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            sudo rm -rf /var/www/my_app
+            sudo mkdir -p /var/www/my_app
+            sudo mv ~/upload_tmp/* /var/www/my_app/
+            sudo chown -R www-data:www-data /var/www/my_app
