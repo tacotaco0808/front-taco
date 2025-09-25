@@ -61,5 +61,5 @@ jobs:
           script: |
             sudo rm -rf /var/www/my_app
             sudo mkdir -p /var/www/my_app
-            sudo mv ~/upload_tmp/* /var/www/my_app/
+            sudo cp -r ~/upload_tmp/dist/* /var/www/my_app/
             sudo chown -R www-data:www-data /var/www/my_app
