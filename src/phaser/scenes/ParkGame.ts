@@ -1,6 +1,6 @@
 import { Scene } from "phaser";
 import type { UserData } from "../types/PhaserTypes";
-import { Player, PlayerManager } from "../character/Characters";
+import { PlayerManager } from "../character/Characters";
 import type { EventData, WsEventHandler } from "../../func/wsEventHandler";
 
 export class ParkGame extends Scene {

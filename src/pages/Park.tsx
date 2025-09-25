@@ -55,7 +55,10 @@ export const Park = () => {
 
   useEffect(() => {
     if (!userData) return;
-    const ws = new WebSocket(`ws://localhost:8000/ws/` + userData.user_id);
+    // const ws = new WebSocket(`ws://localhost:8000/ws/` + userData.user_id);
+    const ws = new WebSocket(
+      `${import.meta.env.VITE_WS}/ws/` + userData.user_id
+    );
     wsRef.current = ws;
     ws.onopen = () => {
       ws.send("接続完了");
