@@ -3,7 +3,7 @@ name: Deploy Frontend
 on:
   push:
     branches:
-      - main   # main に push されたときだけ実行
+      - main
 
 jobs:
   build-and-deploy:
@@ -26,9 +26,9 @@ jobs:
 
       # 4. ビルド
       - name: Build
-        run: npm run build   # vite build → dist/ に出力される想定
+        run: npm run build   # vite build → dist/ に出力
 
-      # 5. 旧アプリをバックアップ（必要なら）
+      # 5. 旧アプリをバックアップ
       - name: Backup existing my_app on VPS
         uses: appleboy/ssh-action@v0.1.7
         with:
@@ -41,7 +41,7 @@ jobs:
               sudo mv /var/www/my_app /var/www/my_app_prev_backup
             fi
 
-      # 6. ビルド成果物を一時ディレクトリへアップロード
+      # 6. ビルド成果物を一時ディレクトリへアップロード（dist/*）
       - name: Upload build files to tmp
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -61,5 +61,5 @@ jobs:
           script: |
             sudo rm -rf /var/www/my_app
             sudo mkdir -p /var/www/my_app
-            sudo mv ~/upload_tmp/* /var/www/my_app/
+            sudo cp -r ~/upload_tmp/dist/* /var/www/my_app/
             sudo chown -R www-data:www-data /var/www/my_app
