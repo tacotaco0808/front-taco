@@ -4,6 +4,7 @@ import { fetchUserData } from "../func/fetchUserData";
 // import { v4 as uuidv4, v4 } from "uuid";
 import { PhaserGame } from "../components/PhaserGame";
 import { WsEventHandler } from "../func/wsEventHandler";
+import { Box, Button, Paper, TextField } from "@mui/material";
 type UserPosition = {
   x: number;
   y: number;
@@ -15,6 +16,7 @@ export const Park = () => {
   const [eventQueue, setEventQueue] = useState<any[]>([]);
   const phaserUserPositionRef = useRef<UserPosition>({ x: 0, y: 0 });
   const wsRef = useRef<WebSocket | null>(null);
+  const [phaserMessage, setPhaserMessage] = useState("");
   const handleSetSceneFunc = (scene: Phaser.Scene) => {
     setScene(scene);
   };
@@ -74,17 +76,51 @@ export const Park = () => {
       wsRef.current = null;
     };
   }, [userData]);
+  const handleSendMessage = () => {
+    setPhaserMessage("");
+  };
   return (
     <>
       {userData && (
-        <PhaserGame
-          sceneName="park"
-          userData={userData}
-          sceneCallBacks={{
-            setSceneFunc: handleSetSceneFunc,
-            onPositionUpdate: handlePositionUpdate,
-          }}
-        />
+        <>
+          <PhaserGame
+            sceneName="park"
+            userData={userData}
+            sceneCallBacks={{
+              setSceneFunc: handleSetSceneFunc,
+              onPositionUpdate: handlePositionUpdate,
+            }}
+          />
+          <Paper
+            sx={{
+              position: "fixed",
+              bottom: 20,
+              left: 20,
+              p: 2,
+              minWidth: 300,
+            }}
+          >
+            <Box sx={{ display: "flex", gap: 1 }}>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="メッセージを入力..."
+                value={phaserMessage}
+                onChange={(e) => setPhaserMessage(e.target.value)}
+              />
+              <Button
+                variant="contained"
+                onClick={handleSendMessage}
+                disabled={!phaserMessage.trim()}
+              >
+                送信
+              </Button>
+              /
+            </Box>
+          </Paper>
+        </>
+
+        // ここにMUIを用いてテキストを送信するための簡単なフォーム
       )}
     </>
   );
