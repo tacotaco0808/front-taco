@@ -23,7 +23,19 @@ jobs:
 
       - name: Build
         run: npm run build   # vite build → dist/ に出力
-
+        
+      - name: Backup existing my_app on VPS
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            if [ -d "/var/www/my_app" ]; then
+              rm -rf /var/www/my_app_prev_backup
+              mv /var/www/my_app /var/www/my_app_prev_backup
+            fi
+            
       - name: Deploy to VPS
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -31,4 +43,4 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           source: "dist/*"
-          target: "/var/www/deploy_test"
+          target: "/var/www/my_app"
