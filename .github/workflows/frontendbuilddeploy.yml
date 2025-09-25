@@ -32,8 +32,8 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             if [ -d "/var/www/my_app" ]; then
-              rm -rf /var/www/my_app_prev_backup
-              mv /var/www/my_app /var/www/my_app_prev_backup
+              sudo rm -rf /var/www/my_app_prev_backup
+              sudo mv /var/www/my_app /var/www/my_app_prev_backup
             fi
             
       - name: Deploy to VPS
