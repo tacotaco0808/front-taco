@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # 3.5. 本番用.envファイルを生成
+      # 3.5. 本番用.envファイルを生成test
       - name: Create .env.production
         run: |
           echo "VITE_CLOUDNAME=${{ secrets.VITE_CLOUDNAME }}" >> .env.production
