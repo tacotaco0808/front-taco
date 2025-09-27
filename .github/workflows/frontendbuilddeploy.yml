@@ -18,15 +18,22 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       # 3. 依存関係インストール
       - name: Install dependencies
         run: npm ci
 
+      # 3.5. 本番用.envファイルを生成
+      - name: Create .env.production
+        run: |
+          echo "VITE_CLOUDNAME=${{ secrets.VITE_CLOUDNAME }}" >> .env.production
+          echo "VITE_IMAGE_API=${{ secrets.VITE_IMAGE_API }}" >> .env.production
+          echo "VITE_WS=${{ secrets.VITE_WS }}" >> .env.production
+
       # 4. ビルド
       - name: Build
-        run: npm run build   # vite build → dist/ に出力
+        run: npm run build # vite build → dist/ に出力
 
       # 5. 旧アプリをバックアップ
       - name: Backup existing my_app on VPS
