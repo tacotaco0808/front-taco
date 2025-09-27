@@ -1,0 +1,72 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. ソースコードを取得
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. Node.js セットアップ
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # 3. 依存関係インストール
+      - name: Install dependencies
+        run: npm ci
+
+      # 3.5. 本番用.envファイルを生成test
+      - name: Create .env.production
+        run: |
+          echo "VITE_CLOUDNAME=${{ secrets.VITE_CLOUDNAME }}" >> .env.production
+          echo "VITE_IMAGE_API=${{ secrets.VITE_IMAGE_API }}" >> .env.production
+          echo "VITE_WS=${{ secrets.VITE_WS }}" >> .env.production
+
+      # 4. ビルド
+      - name: Build
+        run: npm run build # vite build → dist/ に出力
+
+      # 5. 旧アプリをバックアップ
+      - name: Backup existing my_app on VPS
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            if [ -d "/var/www/my_app" ]; then
+              sudo rm -rf /var/www/my_app_prev_backup
+              sudo mv /var/www/my_app /var/www/my_app_prev_backup
+            fi
+
+      # 6. ビルド成果物を一時ディレクトリへアップロード（dist/*）
+      - name: Upload build files to tmp
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "dist/*"
+          target: "~/upload_tmp"
+
+      # 7. 一時ディレクトリから /var/www/my_app へ移動
+      - name: Move files into /var/www/my_app
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            sudo rm -rf /var/www/my_app
+            sudo mkdir -p /var/www/my_app
+            sudo cp -r ~/upload_tmp/dist/* /var/www/my_app/
+            sudo chown -R www-data:www-data /var/www/my_app

@@ -6,7 +6,6 @@ export type EventData = {
 
 export class WsEventHandler {
   private scene: Phaser.Scene | null = null;
-  private cnt = 0;
 
   setScene(scene: Phaser.Scene) {
     this.scene = scene;
