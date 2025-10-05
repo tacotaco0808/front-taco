@@ -29,7 +29,7 @@ export class ParkGame extends Scene {
   }
   //userDataSetter
   setUserData(userData: UserData) {
-    this.userName = userData.user_name;
+    this.userName = userData.name;
   }
   create(data?: {
     userData?: UserData;

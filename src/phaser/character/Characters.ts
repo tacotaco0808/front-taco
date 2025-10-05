@@ -26,11 +26,11 @@ export class PlayerManager {
       );
     }
     player.userData = userData;
-    console.log("ここに入ってほしいよ:" + userData.user_name);
+    console.log("ここに入ってほしいよ:" + userData.name);
 
     //username
     player.usernameText = scene.add
-      .text(0, -70, userData.user_name, {
+      .text(0, -70, userData.name, {
         fontSize: "24px",
         color: "#ffffff",
       })

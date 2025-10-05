@@ -22,7 +22,7 @@ export async function fetchUserData(
 
     const userData: UserData = {
       user_id: res.data.user_id,
-      user_name: res.data.name,
+      name: res.data.name,
       login_id: res.data.login_id,
       created_at: res.data.created_at,
     };
