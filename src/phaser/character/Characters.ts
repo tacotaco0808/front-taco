@@ -1,8 +1,11 @@
+import { fetchUserData } from "../../func/fetchUserData";
+import type { UserData } from "../types/PhaserTypes";
+
 export class PlayerManager {
   //Playerが管理されている
   //Player.playerContainerが実質てきなプレイヤーの実態
   private players: Record<string, Player> = {};
-  addPlayer(
+  async addPlayer(
     key: string, // player_id
     // username: string,
     x: number,
@@ -15,9 +18,19 @@ export class PlayerManager {
     const playerScaleX = scene.cameras.main.width / 5 / player.sprite.width;
     player.sprite.setScale(playerScaleX);
 
+    //userData取得
+    const userData = await fetchUserData(key);
+    if (!userData) {
+      throw new Error(
+        "PlayerManager.addPlayer: ユーザーデータの取得に失敗しました (fetchUserData returned null/undefined)"
+      );
+    }
+    player.userData = userData;
+    console.log("ここに入ってほしいよ:" + userData.user_name);
+
     //username
     player.usernameText = scene.add
-      .text(0, -70, key, {
+      .text(0, -70, userData.user_name, {
         fontSize: "24px",
         color: "#ffffff",
       })
@@ -69,6 +82,7 @@ export class Player {
   usernameText!: Phaser.GameObjects.Text;
   playerContainer!: Phaser.GameObjects.Container;
   playerSize = 0.7;
+  userData!: UserData;
 
   // username: string;
   x: number;
