@@ -39,6 +39,10 @@ export class ParkGame extends Scene {
       // 他のコールバックも追加可能
     };
   }) {
+    // userDataを設定
+    if (data?.userData) {
+      this.setUserData(data.userData);
+    }
     //コールバックの処理
     if (data?.sceneCallBacks?.setSceneFunc) {
       data.sceneCallBacks.setSceneFunc(this); // ← Park.tsxのsetSceneにParkGameインスタンスを渡す
