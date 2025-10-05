@@ -24,9 +24,11 @@ export const Home = () => {
           withCredentials: true,
         });
         const resData = res.data;
+        console.log("Home.tsx - APIレスポンス:", resData); // ← 追加
         setUserData(resData);
+        console.log("Home.tsx - setUserData後:", resData); // ← 追加
       } catch (error) {
-        console.log(error);
+        console.log("Home.tsx - APIエラー:", error); // ← 修正
       }
       setIsVisiblePhaser(true);
     };
@@ -34,7 +36,7 @@ export const Home = () => {
   }, []);
   return (
     <div>
-      {userData && <div>{userData.user_name}</div>}
+      {userData && <div>{userData.name}</div>}
       <div className={styles.mv_wrapper}>
         {isVisiblePhaser && (
           <PhaserGame
@@ -68,7 +70,7 @@ export const Home = () => {
                 画像の投稿をする
               </Button>
               {userData ? (
-                <div>ユーザ：{userData.user_name}でログインしています</div>
+                <div>ユーザ：{userData.name}でログインしています</div>
               ) : (
                 <p>画像の投稿にはログインが必要です。</p>
               )}
