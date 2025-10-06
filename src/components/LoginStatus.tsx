@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { AppBar, Toolbar, Typography, Chip, Box, Button } from "@mui/material";
 import type { UserData } from "../phaser/types/PhaserTypes";
-import { Navigate, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 
 type Props = {
   userData: UserData | null;
