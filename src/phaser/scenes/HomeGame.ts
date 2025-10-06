@@ -18,6 +18,7 @@ export class HomeGame extends Scene {
   pcObjSize = 7;
   isOverlapping = false;
   promptDecide!: SpineGameObject | Phaser.GameObjects.Sprite;
+  targetPosition: { x: number; y: number } | null = null; // 目的地を追加
 
   //userDataSetter
   setUserData(userData: UserData) {
@@ -133,23 +134,61 @@ export class HomeGame extends Scene {
       this.promptDecide.setPosition(this.pcObj.x, this.pcObj.y - 80);
       this.isOverlapping = true;
     });
+
+    // マウス/タッチクリックイベントを追加
+    this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+      this.targetPosition = { x: pointer.worldX, y: pointer.worldY };
+    });
   }
   update() {
     const player = this.playerContainer.body as Phaser.Physics.Arcade.Body;
-    if (this.cursors.right.isDown) {
+
+    // タッチ移動の処理
+    if (this.targetPosition) {
+      const distance = Phaser.Math.Distance.Between(
+        this.playerContainer.x,
+        this.playerContainer.y,
+        this.targetPosition.x,
+        this.targetPosition.y
+      );
+
+      // 目的地に近づいたら停止
+      if (distance < 5) {
+        this.targetPosition = null;
+        player.setVelocity(0, 0);
+      } else {
+        // 目的地に向かう方向を計算
+        const angle = Phaser.Math.Angle.Between(
+          this.playerContainer.x,
+          this.playerContainer.y,
+          this.targetPosition.x,
+          this.targetPosition.y
+        );
+
+        // 速度を設定
+        const velocityX = Math.cos(angle) * this.playerSpeed;
+        const velocityY = Math.sin(angle) * this.playerSpeed;
+        player.setVelocity(velocityX, velocityY);
+      }
+    }
+    // キーボード操作（既存の処理を else if に変更）
+    else if (this.cursors.right.isDown) {
       player.setVelocityX(this.playerSpeed);
+      player.setVelocityY(0);
     } else if (this.cursors.left.isDown) {
       player.setVelocityX(-1 * this.playerSpeed);
-    } else {
-      player.setVelocityX(0);
-    }
-    if (this.cursors.down.isDown) {
+      player.setVelocityY(0);
+    } else if (this.cursors.down.isDown) {
       player.setVelocityY(this.playerSpeed);
+      player.setVelocityX(0);
     } else if (this.cursors.up.isDown) {
       player.setVelocityY(-1 * this.playerSpeed);
+      player.setVelocityX(0);
     } else {
-      player.setVelocityY(0);
+      player.setVelocity(0, 0);
     }
+
+    // スペースキーの処理
     if (Phaser.Input.Keyboard.JustDown(this.spaceBar) && this.isOverlapping) {
       if (this.toggleShowGallery) {
         this.toggleShowGallery();
@@ -157,7 +196,6 @@ export class HomeGame extends Scene {
     }
     // 表示切り替えをフラグで制御
     this.promptDecide.setVisible(this.isOverlapping);
-
     this.isOverlapping = false;
   }
 }

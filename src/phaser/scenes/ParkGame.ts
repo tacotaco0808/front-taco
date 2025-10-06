@@ -15,6 +15,7 @@ export class ParkGame extends Scene {
 
   playerContainer!: Phaser.GameObjects.Container;
   playerSize = 0.7;
+  targetPosition: { x: number; y: number } | null = null; // 目的地を追加
   //コールバック関数
   onPositionUpdate?: (x: number, y: number) => void;
 
@@ -100,6 +101,11 @@ export class ParkGame extends Scene {
     //cursor
     this.cursors = this.input.keyboard!.createCursorKeys();
 
+    // マウス/タッチクリックイベントを追加
+    this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+      this.targetPosition = { x: pointer.worldX, y: pointer.worldY };
+    });
+
     //定期イベント
     this.time.addEvent({
       delay: 500,
@@ -138,19 +144,50 @@ export class ParkGame extends Scene {
   }
   update() {
     const player = this.playerContainer.body as Phaser.Physics.Arcade.Body;
-    if (this.cursors.right.isDown) {
+
+    // タッチ移動の処理
+    if (this.targetPosition) {
+      const distance = Phaser.Math.Distance.Between(
+        this.playerContainer.x,
+        this.playerContainer.y,
+        this.targetPosition.x,
+        this.targetPosition.y
+      );
+
+      // 目的地に近づいたら停止
+      if (distance < 5) {
+        this.targetPosition = null;
+        player.setVelocity(0, 0);
+      } else {
+        // 目的地に向かう方向を計算
+        const angle = Phaser.Math.Angle.Between(
+          this.playerContainer.x,
+          this.playerContainer.y,
+          this.targetPosition.x,
+          this.targetPosition.y
+        );
+
+        // 速度を設定
+        const velocityX = Math.cos(angle) * this.playerSpeed;
+        const velocityY = Math.sin(angle) * this.playerSpeed;
+        player.setVelocity(velocityX, velocityY);
+      }
+    }
+    // キーボード操作（既存の処理を else if に変更）
+    else if (this.cursors.right.isDown) {
       player.setVelocityX(this.playerSpeed);
+      player.setVelocityY(0);
     } else if (this.cursors.left.isDown) {
       player.setVelocityX(-1 * this.playerSpeed);
-    } else {
-      player.setVelocityX(0);
-    }
-    if (this.cursors.down.isDown) {
+      player.setVelocityY(0);
+    } else if (this.cursors.down.isDown) {
       player.setVelocityY(this.playerSpeed);
+      player.setVelocityX(0);
     } else if (this.cursors.up.isDown) {
       player.setVelocityY(-1 * this.playerSpeed);
+      player.setVelocityX(0);
     } else {
-      player.setVelocityY(0);
+      player.setVelocity(0, 0);
     }
   }
 }
