@@ -25,12 +25,8 @@ export const Home = () => {
           withCredentials: true,
         });
         const resData = res.data;
-        console.log("Home.tsx - APIレスポンス:", resData); // ← 追加
         setUserData(resData);
-        console.log("Home.tsx - setUserData後:", resData); // ← 追加
-      } catch (error) {
-        console.log("Home.tsx - APIエラー:", error); // ← 修正
-      }
+      } catch (error) {}
       setIsVisiblePhaser(true);
     };
     get_me();
@@ -50,8 +46,8 @@ export const Home = () => {
         )}
 
         <p>
-          カーソル（←↑→↓）で動かしてみよう! <br />
-          スペースで決定できるよ
+          ゲーム画面をタッチして動かしてみよう <br />
+          PCの近くに行って、出てきた表示をタップ!
           <br />
           PCを開いてみよう!
         </p>

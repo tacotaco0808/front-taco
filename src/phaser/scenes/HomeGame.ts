@@ -135,6 +135,14 @@ export class HomeGame extends Scene {
       this.isOverlapping = true;
     });
 
+    // promptDecideをインタラクティブにしてクリックイベントを追加
+    this.promptDecide.setInteractive();
+    this.promptDecide.on("pointerdown", () => {
+      if (this.toggleShowGallery) {
+        this.toggleShowGallery();
+      }
+    });
+
     // マウス/タッチクリックイベントを追加
     this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
       this.targetPosition = { x: pointer.worldX, y: pointer.worldY };
@@ -188,12 +196,6 @@ export class HomeGame extends Scene {
       player.setVelocity(0, 0);
     }
 
-    // スペースキーの処理
-    if (Phaser.Input.Keyboard.JustDown(this.spaceBar) && this.isOverlapping) {
-      if (this.toggleShowGallery) {
-        this.toggleShowGallery();
-      }
-    }
     // 表示切り替えをフラグで制御
     this.promptDecide.setVisible(this.isOverlapping);
     this.isOverlapping = false;
