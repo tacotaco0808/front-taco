@@ -8,10 +8,11 @@ import axios from "axios";
 import type { UserData } from "../phaser/types/PhaserTypes";
 import { Link } from "react-router";
 import { Button } from "@mui/material";
+import { LoginStatus } from "../components/LoginStatus";
 export const Home = () => {
   const [isVisbleGallery, setIsVisibleGallery] = useState(false);
   const [isVisiblePhaser, setIsVisiblePhaser] = useState(false);
-  const [userData, setUserData] = useState<UserData | null>();
+  const [userData, setUserData] = useState<UserData | null>(null);
   const handleSetSceneFunc = (scene: Phaser.Scene) => {
     (scene as HomeGame).toggleShowGallery = () => {
       setIsVisibleGallery((prev) => !prev);
@@ -36,7 +37,7 @@ export const Home = () => {
   }, []);
   return (
     <div>
-      {userData && <div>{userData.name}</div>}
+      <LoginStatus userData={userData} />
       <div className={styles.mv_wrapper}>
         {isVisiblePhaser && (
           <PhaserGame
