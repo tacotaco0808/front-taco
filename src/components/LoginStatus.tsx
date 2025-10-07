@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AppBar, Toolbar, Typography, Chip, Box, Button } from "@mui/material";
+import { AppBar, Toolbar, Typography, Box, Button } from "@mui/material";
 import type { UserData } from "../phaser/types/PhaserTypes";
 import { logoutUser } from "../func/logoutUser";
 import { useNavigate } from "react-router";
