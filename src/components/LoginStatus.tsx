@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
-import { AppBar, Toolbar, Typography, Chip, Box, Button } from "@mui/material";
+import { AppBar, Toolbar, Typography, Box, Button } from "@mui/material";
 import type { UserData } from "../phaser/types/PhaserTypes";
+import { logoutUser } from "../func/logoutUser";
 import { useNavigate } from "react-router";
 
 type Props = {
   userData: UserData | null;
+  onLogout?: () => void; // ログアウト時のコールバック
 };
 
-export const LoginStatus = ({ userData }: Props) => {
-  /*ユーザのログイン情報を表示する */
+export const LoginStatus = ({ userData, onLogout }: Props) => {
   const [isLogin, setIsLogin] = useState(false);
   const navigate = useNavigate();
 
@@ -25,6 +26,18 @@ export const LoginStatus = ({ userData }: Props) => {
     navigate("/login");
   };
 
+  const handleLogoutClick = async () => {
+    const success = await logoutUser();
+    if (success) {
+      // ローカルの状態をクリア
+      setIsLogin(false);
+      if (onLogout) {
+        onLogout(); // 親コンポーネントの状態もクリア
+      }
+      // navigate("/login");
+    }
+  };
+
   return (
     <AppBar position="static" color="primary" sx={{ mb: 2 }}>
       <Toolbar>
@@ -36,15 +49,27 @@ export const LoginStatus = ({ userData }: Props) => {
 
         {isLogin && userData ? (
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Chip
-              label={`🐙 ${userData.name}でログインしています`}
-              color="secondary"
-              variant="filled"
+            <Box
               sx={{
                 backgroundColor: "rgba(255, 255, 255, 0.2)",
                 color: "white",
+                padding: "6px 12px",
+                borderRadius: "16px",
+                fontSize: "0.875rem",
               }}
-            />
+            >
+              🐙 {userData.name}でログインしています
+            </Box>
+            <Button
+              color="inherit"
+              onClick={handleLogoutClick}
+              sx={{
+                color: "white",
+                textTransform: "none",
+              }}
+            >
+              ログアウト
+            </Button>
           </Box>
         ) : (
           <Button

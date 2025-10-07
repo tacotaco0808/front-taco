@@ -14,7 +14,19 @@ export const Home = () => {
   const [isVisbleGallery, setIsVisibleGallery] = useState(false);
   const [isVisiblePhaser, setIsVisiblePhaser] = useState(false);
   const [userData, setUserData] = useState<UserData | null>(null);
-  const galleryRef = useRef<HTMLDivElement>(null); // ギャラリー要素への参照
+  const galleryRef = useRef<HTMLDivElement>(null);
+
+  // ログアウト時の処理
+  const handleLogout = () => {
+    setUserData(null);
+    setIsVisibleGallery(false);
+    setIsVisiblePhaser(false); // Phaserを非表示
+
+    // 100ms後にPhaserを再表示（コンポーネント再作成）
+    setTimeout(() => {
+      setIsVisiblePhaser(true);
+    }, 100);
+  };
 
   const handleSetSceneFunc = (scene: Phaser.Scene) => {
     (scene as HomeGame).toggleShowGallery = () => {
@@ -48,7 +60,7 @@ export const Home = () => {
 
   return (
     <div>
-      <LoginStatus userData={userData} />
+      <LoginStatus userData={userData} onLogout={handleLogout} />
       <div className={styles.mv_wrapper}>
         {isVisiblePhaser && (
           <PhaserGame
