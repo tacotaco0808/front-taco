@@ -1,7 +1,7 @@
 import styles from "./Home.module.scss";
 import WindowBar from "/assets/window_bar.png";
 import { PhaserGame } from "../components/PhaserGame";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import type { HomeGame } from "../phaser/scenes/HomeGame";
 import { SearchImages } from "../components/SearchImages";
 import axios from "axios";
@@ -9,15 +9,29 @@ import type { UserData } from "../phaser/types/PhaserTypes";
 import { Link } from "react-router";
 import { Button } from "@mui/material";
 import { LoginStatus } from "../components/LoginStatus";
+
 export const Home = () => {
   const [isVisbleGallery, setIsVisibleGallery] = useState(false);
   const [isVisiblePhaser, setIsVisiblePhaser] = useState(false);
   const [userData, setUserData] = useState<UserData | null>(null);
+  const galleryRef = useRef<HTMLDivElement>(null); // ギャラリー要素への参照
+
   const handleSetSceneFunc = (scene: Phaser.Scene) => {
     (scene as HomeGame).toggleShowGallery = () => {
       setIsVisibleGallery((prev) => !prev);
     };
   };
+
+  // ギャラリーが表示された時に自動スクロール
+  useEffect(() => {
+    if (isVisbleGallery && galleryRef.current) {
+      galleryRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [isVisbleGallery]);
+
   useEffect(() => {
     const get_me = async () => {
       try {
@@ -31,6 +45,7 @@ export const Home = () => {
     };
     get_me();
   }, []);
+
   return (
     <div>
       <LoginStatus userData={userData} />
@@ -52,7 +67,7 @@ export const Home = () => {
           PCを開いてみよう!
         </p>
       </div>
-      <div>
+      <div ref={galleryRef}>
         {isVisbleGallery && (
           <div className={styles.mv_gallery}>
             <div className={styles.pc_window}>
