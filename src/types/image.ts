@@ -7,6 +7,8 @@ export interface Image {
   description: string;
   format: string;
   version: number;
+  created_at: string;
+  image_url: string;
 }
 export interface GalleryImage extends Image {
   url: string;
