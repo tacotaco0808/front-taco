@@ -1,0 +1,146 @@
+.imageDetailContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.imageDetailCard {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.imageContainer {
+  position: relative;
+  width: 100%;
+  max-height: 70vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #000;
+}
+
+.mainImage {
+  max-width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+  display: block;
+}
+
+.imageInfo {
+  padding: 24px;
+}
+
+.imageTitle {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.imageDescription {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 20px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.imageMetadata {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.metadataItem {
+  display: flex;
+  flex-direction: column;
+}
+
+.metadataLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.metadataValue {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+.backButton {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  margin-bottom: 20px;
+}
+
+.backButton:hover {
+  background-color: #0056b3;
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  font-size: 18px;
+  color: #666;
+}
+
+.errorContainer {
+  text-align: center;
+  padding: 40px;
+  color: #d32f2f;
+  font-size: 18px;
+}
+
+.errorMessage {
+  margin-bottom: 20px;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .imageDetailContainer {
+    padding: 16px;
+  }
+
+  .imageTitle {
+    font-size: 24px;
+  }
+
+  .imageInfo {
+    padding: 16px;
+  }
+
+  .imageContainer {
+    max-height: 50vh;
+  }
+
+  .mainImage {
+    max-height: 50vh;
+  }
+
+  .imageMetadata {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}

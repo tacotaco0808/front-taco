@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router";
 import { createImagesUrlList } from "../func/createImagesUrlList";
 import type { UUID, GalleryImage } from "../types/image";
 import { fetchImagesData, type ImagesResponse } from "../func/fetchImagesData";
@@ -19,6 +20,7 @@ type Props = {
 };
 
 export const ImagesList = ({ user_id, format, limit = 4 }: Props) => {
+  const navigate = useNavigate();
   const [imagesData, setImagesData] = useState<GalleryImage[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [pageNum, setPageNum] = useState<number>(1); //1:off0 2:off10 3:off20
@@ -28,6 +30,11 @@ export const ImagesList = ({ user_id, format, limit = 4 }: Props) => {
 
   // 総ページ数を計算
   const totalPages = Math.ceil(totalImages / limit);
+
+  // 画像詳細ページへの遷移
+  const handleImageClick = (imageId: string) => {
+    navigate(`/images/${imageId}`);
+  };
 
   //データ取得
   useEffect(() => {
@@ -139,6 +146,8 @@ export const ImagesList = ({ user_id, format, limit = 4 }: Props) => {
               <ImageListItem
                 className={styles.imagelist_item}
                 key={item.public_id}
+                onClick={() => handleImageClick(item.public_id)}
+                sx={{ cursor: "pointer" }}
               >
                 <img src={item.url} alt={item.title || ""} />
                 <ImageListItemBar

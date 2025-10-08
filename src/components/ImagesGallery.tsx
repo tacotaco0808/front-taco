@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { createImagesUrlList } from "../func/createImagesUrlList";
 import type { UUID, GalleryImage } from "../types/image";
 import { fetchImagesData, type ImagesResponse } from "../func/fetchImagesData";
@@ -9,9 +10,15 @@ type Props = {
   interval?: number; // msスライドショー切り替え時間
 };
 export const ImagesGallery = ({ user_id, format, interval = 3000 }: Props) => {
+  const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [imagesData, setImagesData] = useState<GalleryImage[]>([]);
   const [error, setError] = useState(false);
+
+  // 画像詳細ページへの遷移
+  const handleImageClick = (imageId: string) => {
+    navigate(`/images/${imageId}`);
+  };
 
   //データ取得
   useEffect(() => {
@@ -57,7 +64,11 @@ export const ImagesGallery = ({ user_id, format, interval = 3000 }: Props) => {
       {imagesData.length > 0 && (
         <>
           <h3>{imagesData[currentIndex].title}</h3>
-          <div className={styles.gallery_wrapper}>
+          <div
+            className={styles.gallery_wrapper}
+            onClick={() => handleImageClick(imagesData[currentIndex].public_id)}
+            style={{ cursor: "pointer" }}
+          >
             <img
               src={imagesData[currentIndex].url}
               alt={`Image ${currentIndex}`}
