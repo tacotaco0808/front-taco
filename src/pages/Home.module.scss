@@ -37,10 +37,15 @@ body {
 .mv_gallery {
   display: flex;
   justify-content: center;
+  align-items: flex-start; // 上揃えで安定したレイアウト
   padding: 2rem;
   background-color: rgb(44, 145, 145);
+  min-height: 600px; // 最小高さを固定
+  height: auto; // 内容に応じて拡張
+  box-sizing: border-box; // パディングを含めた高さ計算
   .pc_window {
     max-width: 70%;
+    width: 100%;
     display: flex;
     justify-content: center;
     flex-direction: column;
@@ -48,6 +53,9 @@ body {
     margin-top: 2rem;
     background-color: aquamarine;
     padding-bottom: 2rem;
+    min-height: 500px; // PC窓の最小高さも固定
+    border-radius: 8px; // 見た目の改善
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); // 奥行き感を追加
     img {
       background-color: rgb(44, 145, 145);
     }
