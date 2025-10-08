@@ -29,6 +29,12 @@ export const GameStart = (
     parent: parent,
     backgroundColor: "#028af8",
     scene: [Boot, Preloader, HomeGame, ParkGame],
+    scale: {
+      mode: Phaser.Scale.FIT,
+      autoCenter: Phaser.Scale.CENTER_BOTH,
+      width: 500,
+      height: 500,
+    },
     physics: {
       default: "arcade",
       arcade: {
