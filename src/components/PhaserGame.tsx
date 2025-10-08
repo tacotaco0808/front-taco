@@ -32,12 +32,9 @@ export const PhaserGame = ({ sceneName, sceneCallBacks, userData }: Props) => {
         const containerWidth = container.clientWidth;
         const containerHeight = container.clientHeight;
 
-        // アスペクト比を維持しながらリサイズ
-        const scale = Math.min(containerWidth / 500, containerHeight / 500);
-        const newWidth = 500 * scale;
-        const newHeight = 500 * scale;
-
-        gameRef.current.scale.resize(newWidth, newHeight);
+        // Phaserの内蔵スケールマネージャーを使用してリサイズ
+        // これにより内部座標系（500x500）が維持される
+        gameRef.current.scale.setParentSize(containerWidth, containerHeight);
         gameRef.current.scale.refresh();
       }
     };
