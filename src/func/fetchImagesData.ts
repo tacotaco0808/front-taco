@@ -1,28 +1,39 @@
 import axios from "axios";
 import type { UUID, Image } from "../types/image";
 
+export type ImagesResponse = {
+  images: Image[];
+  total: number;
+  count: number;
+};
+
 type Props = {
   user_id?: UUID;
   format?: string;
+  limit?: number;
+  offset?: number;
 };
 export async function fetchImagesData({
   user_id,
   format,
-}: Props): Promise<Image[]> {
+  limit = 10,
+  offset = 0,
+}: Props): Promise<ImagesResponse> {
   try {
-    // 条件に一致する画像を複数取得
     const res = await axios.get(`${import.meta.env.VITE_IMAGE_API}/images`, {
       params: {
         user_id: user_id,
         format: format,
+        limit: limit,
+        offset: offset,
       },
     });
-    const images: Image[] = res.data;
-    // imagesが空の場合エラーとして処理
-    if (!images || images.length === 0) {
-      throw new Error("検索された画像は見つかりませんでした。");
-    }
-    return images;
+
+    return {
+      images: res.data.images,
+      total: res.data.total,
+      count: res.data.count,
+    };
   } catch (error) {
     throw error;
   }
