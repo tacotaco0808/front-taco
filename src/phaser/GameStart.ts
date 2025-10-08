@@ -34,6 +34,9 @@ export const GameStart = (
       autoCenter: Phaser.Scale.CENTER_BOTH,
       width: 500,
       height: 500,
+      // レスポンシブ対応のためのスケール設定
+      expandParent: false,
+      fullscreenTarget: parent,
     },
     physics: {
       default: "arcade",
