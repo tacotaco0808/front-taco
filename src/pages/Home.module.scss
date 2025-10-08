@@ -38,13 +38,12 @@ body {
   display: flex;
   justify-content: center;
   align-items: flex-start; // 上揃えで安定したレイアウト
-  padding: 2rem;
+  padding: 3%;
   background-color: rgb(44, 145, 145);
   min-height: 600px; // 最小高さを固定
   height: auto; // 内容に応じて拡張
   box-sizing: border-box; // パディングを含めた高さ計算
   .pc_window {
-    max-width: 70%;
     width: 100%;
     display: flex;
     justify-content: center;

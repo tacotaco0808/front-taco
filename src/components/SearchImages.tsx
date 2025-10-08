@@ -37,28 +37,31 @@ export const SearchImages = () => {
   };
 
   const handleClickButton = () => {
-    // setInput_id(user_id);
+    setInput_id(user_id);
   };
+
   return (
     <>
       <div className={styles.wrapper}>
-        <FormControl sx={{ minWidth: "10rem" }}>
-          <InputLabel id="search-format-label">Search Format</InputLabel>
+        <FormControl className={styles.search_format}>
+          <InputLabel id="search-format-label">フォーマット</InputLabel>
           <Select
             labelId="search-format-label"
             id="search-format"
             value={format ?? ""}
-            label="search format"
+            label="フォーマット"
             onChange={handleChange}
+            size="small"
           >
             <MenuItem value={""}>指定しない</MenuItem>
-            <MenuItem value={"png"}>png</MenuItem>
-            <MenuItem value={"jpg"}>jpg</MenuItem>
-            <MenuItem value={"jpeg"}>jpeg</MenuItem>
+            <MenuItem value={"png"}>PNG</MenuItem>
+            <MenuItem value={"jpg"}>JPG</MenuItem>
+            <MenuItem value={"jpeg"}>JPEG</MenuItem>
           </Select>
         </FormControl>
+
         <FormControl className={styles.search_userid}>
-          <InputLabel htmlFor="search-userid">Search User ID</InputLabel>
+          <InputLabel htmlFor="search-userid">ユーザーID</InputLabel>
           <Input
             className={styles.input}
             id="search-userid"
@@ -70,14 +73,17 @@ export const SearchImages = () => {
                 setInput_id(e.currentTarget.value);
               }
             }}
+            size="small"
+            placeholder="ユーザーIDを入力"
           />
 
-          {/* <FormHelperText id="userid-helper-text">
-              Search images from User ID
-            </FormHelperText> */}
-
-          <Button variant="outlined" onClick={handleClickButton} sx={{ ml: 2 }}>
-            Search
+          <Button
+            variant="contained"
+            onClick={handleClickButton}
+            className={styles.search_button}
+            color="primary"
+          >
+            🔍 検索
           </Button>
         </FormControl>
       </div>
