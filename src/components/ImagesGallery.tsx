@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createImagesUrlList } from "../func/createImagesUrlList";
-import type { UUID, Image, GalleryImage } from "../types/image";
-import { fetchImagesData } from "../func/fetchImagesData";
+import type { UUID, GalleryImage } from "../types/image";
+import { fetchImagesData, type ImagesResponse } from "../func/fetchImagesData";
 import styles from "./ImageGallery.module.scss";
 type Props = {
   user_id?: UUID;
@@ -16,15 +16,23 @@ export const ImagesGallery = ({ user_id, format, interval = 3000 }: Props) => {
   //データ取得
   useEffect(() => {
     async function fetchUrlList() {
-      const images: Image[] = await fetchImagesData({ user_id, format });
-      const urlList = createImagesUrlList(images);
-      if (urlList) {
-        const galleryImages: GalleryImage[] = images.map((image, index) => ({
-          ...image,
-          url: urlList[index],
-        }));
-        setImagesData(galleryImages);
-      } else {
+      try {
+        const response: ImagesResponse = await fetchImagesData({
+          user_id,
+          format,
+        });
+        const { images } = response;
+        const urlList = createImagesUrlList(images);
+        if (urlList) {
+          const galleryImages: GalleryImage[] = images.map((image, index) => ({
+            ...image,
+            url: urlList[index],
+          }));
+          setImagesData(galleryImages);
+        } else {
+          setError(true);
+        }
+      } catch (error) {
         setError(true);
       }
     }
