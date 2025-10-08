@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { createImagesUrlList } from "../func/createImagesUrlList";
 import type { UUID, GalleryImage } from "../types/image";
 import { fetchImagesData, type ImagesResponse } from "../func/fetchImagesData";
@@ -24,6 +24,7 @@ export const ImagesList = ({ user_id, format, limit = 4 }: Props) => {
   const [pageNum, setPageNum] = useState<number>(1); //1:off0 2:off10 3:off20
   const [totalImages, setTotalImages] = useState<number>(0); // 総画像数
   const [loading, setLoading] = useState<boolean>(false);
+  const containerRef = useRef<HTMLDivElement>(null); // コンテナへの参照
 
   // 総ページ数を計算
   const totalPages = Math.ceil(totalImages / limit);
@@ -78,7 +79,23 @@ export const ImagesList = ({ user_id, format, limit = 4 }: Props) => {
     _event: React.ChangeEvent<unknown>, // _をつけて未使用を明示
     value: number
   ) => {
-    setPageNum(value);
+    // ページ変更前にコンテナの位置をスクロール位置として記憶
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const scrollY = window.scrollY + rect.top;
+
+      setPageNum(value);
+
+      // ページ変更後にスクロール位置を復元
+      setTimeout(() => {
+        window.scrollTo({
+          top: scrollY,
+          behavior: "smooth",
+        });
+      }, 100);
+    } else {
+      setPageNum(value);
+    }
   };
 
   if (error) {
@@ -87,6 +104,7 @@ export const ImagesList = ({ user_id, format, limit = 4 }: Props) => {
 
   return (
     <Box
+      ref={containerRef}
       sx={{
         width: "100%",
         display: "flex",
@@ -96,9 +114,19 @@ export const ImagesList = ({ user_id, format, limit = 4 }: Props) => {
     >
       {/* ローディング表示 */}
       {loading && (
-        <Typography variant="body2" sx={{ p: 2 }}>
-          読み込み中...
-        </Typography>
+        <Box
+          sx={{
+            width: "90%",
+            height: 450,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "#f5f5f5",
+            borderRadius: "8px",
+          }}
+        >
+          <Typography variant="body2">読み込み中...</Typography>
+        </Box>
       )}
 
       {/* 画像一覧 */}
@@ -125,9 +153,25 @@ export const ImagesList = ({ user_id, format, limit = 4 }: Props) => {
 
       {/* 画像がない場合 */}
       {imagesData.length === 0 && !loading && !error && (
-        <Typography variant="body1" sx={{ p: 4, textAlign: "center" }}>
-          画像が見つかりませんでした
-        </Typography>
+        <Box
+          sx={{
+            width: "90%",
+            height: 450,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "#f9f9f9",
+            borderRadius: "8px",
+            border: "2px dashed #ccc",
+          }}
+        >
+          <Typography
+            variant="body1"
+            sx={{ textAlign: "center", color: "#666" }}
+          >
+            画像が見つかりませんでした
+          </Typography>
+        </Box>
       )}
 
       {/* ページネーション */}
