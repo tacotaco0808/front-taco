@@ -1,15 +1,20 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router";
+import { useParams, useNavigate, useLocation } from "react-router";
 import { fetchImageDetail } from "../func/fetchImageDetail";
 import type { Image as ImageType } from "../types/image";
+import type { NavigationState } from "../types/navigation";
 import styles from "./Image.module.scss";
 
 export const Image = () => {
   const { imageId } = useParams<{ imageId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const [image, setImage] = useState<ImageType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // 前のページから受け取った状態
+  const navigationState = location.state as NavigationState | null;
 
   useEffect(() => {
     const loadImage = async () => {
@@ -41,7 +46,21 @@ export const Image = () => {
   }, [imageId]);
 
   const handleBack = () => {
-    navigate(-1);
+    // 状態がある場合はHomeページに戻る、ない場合は前のページに戻る
+    if (navigationState && navigationState.fromPage === "home") {
+      navigate("/", {
+        state: {
+          restoreGallery: true,
+          galleryState: {
+            isGalleryVisible: navigationState.isGalleryVisible,
+            currentPage: navigationState.currentPage,
+            searchFilters: navigationState.searchFilters,
+          },
+        },
+      });
+    } else {
+      navigate(-1);
+    }
   };
 
   const formatDate = (dateString: string) => {

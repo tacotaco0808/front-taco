@@ -17,7 +17,19 @@ export const ImagesGallery = ({ user_id, format, interval = 3000 }: Props) => {
 
   // 画像詳細ページへの遷移
   const handleImageClick = (imageId: string) => {
-    navigate(`/images/${imageId}`);
+    // 現在の状態を渡して画像詳細ページに遷移
+    navigate(`/images/${imageId}`, {
+      state: {
+        fromPage: "home",
+        isGalleryVisible: true,
+        currentPage: 1, // ギャラリーの場合は常に1ページ目
+        searchFilters: {
+          format: format || undefined,
+          user_id: user_id || undefined,
+        },
+        timestamp: Date.now(),
+      },
+    });
   };
 
   //データ取得

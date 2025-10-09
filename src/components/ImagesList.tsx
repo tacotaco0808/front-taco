@@ -17,13 +17,26 @@ type Props = {
   user_id?: UUID;
   format?: string;
   limit?: number;
+  currentPage?: number;
+  onPageChange?: (page: number) => void;
 };
 
-export const ImagesList = ({ user_id, format, limit = 4 }: Props) => {
+export const ImagesList = ({
+  user_id,
+  format,
+  limit = 4,
+  currentPage = 1,
+  onPageChange,
+}: Props) => {
   const navigate = useNavigate();
   const [imagesData, setImagesData] = useState<GalleryImage[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [pageNum, setPageNum] = useState<number>(1); //1:off0 2:off10 3:off20
+  const [pageNum, setPageNum] = useState<number>(currentPage); //1:off0 2:off10 3:off20
+
+  // currentPageが変更された時にローカル状態を更新
+  useEffect(() => {
+    setPageNum(currentPage);
+  }, [currentPage]);
   const [totalImages, setTotalImages] = useState<number>(0); // 総画像数
   const [loading, setLoading] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null); // コンテナへの参照
@@ -33,7 +46,19 @@ export const ImagesList = ({ user_id, format, limit = 4 }: Props) => {
 
   // 画像詳細ページへの遷移
   const handleImageClick = (imageId: string) => {
-    navigate(`/images/${imageId}`);
+    // 現在の状態を渡して画像詳細ページに遷移
+    navigate(`/images/${imageId}`, {
+      state: {
+        fromPage: "home",
+        isGalleryVisible: true,
+        currentPage: pageNum,
+        searchFilters: {
+          format: format || undefined,
+          user_id: user_id || undefined,
+        },
+        timestamp: Date.now(),
+      },
+    });
   };
 
   //データ取得
@@ -92,6 +117,11 @@ export const ImagesList = ({ user_id, format, limit = 4 }: Props) => {
       const scrollY = window.scrollY + rect.top;
 
       setPageNum(value);
+
+      // 親コンポーネントに現在のページを通知
+      if (onPageChange) {
+        onPageChange(value);
+      }
 
       // ページ変更後にスクロール位置を復元
       setTimeout(() => {
