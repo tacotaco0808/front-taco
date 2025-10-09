@@ -5,6 +5,7 @@ import { fetchUserData } from "../func/fetchUserData";
 import { PhaserGame } from "../components/PhaserGame";
 import { WsEventHandler } from "../func/wsEventHandler";
 import { Box, Button, Paper, TextField } from "@mui/material";
+import { useNavigate } from "react-router";
 type UserPosition = {
   x: number;
   y: number;
@@ -17,6 +18,7 @@ export const Park = () => {
   const phaserUserPositionRef = useRef<UserPosition>({ x: 0, y: 0 });
   const wsRef = useRef<WebSocket | null>(null);
   const [phaserMessage, setPhaserMessage] = useState("");
+  const navigate = useNavigate();
   const handleSetSceneFunc = (scene: Phaser.Scene) => {
     setScene(scene);
   };
@@ -38,6 +40,8 @@ export const Park = () => {
       const me = await fetchUserData();
       if (me) {
         setUserData(me);
+      } else {
+        navigate("/login");
       }
     };
     getMe();
