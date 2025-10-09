@@ -11,33 +11,65 @@ import { useState } from "react";
 import { ImagesList } from "./ImagesList";
 import styles from "./SearchImages.module.scss";
 
-export const SearchImages = () => {
-  const [format, setFormat] = useState<string>();
-  const [user_id, setUser_id] = useState<string>();
-  const [input_id, setInput_id] = useState<string>();
+interface SearchState {
+  currentPage: number;
+  searchFilters: {
+    format?: string;
+    user_id?: string;
+  };
+}
+
+interface Props {
+  initialState?: SearchState;
+  onStateChange?: (state: SearchState) => void;
+}
+
+export const SearchImages = ({ initialState, onStateChange }: Props) => {
+  const [format, setFormat] = useState<string>(
+    initialState?.searchFilters.format || ""
+  );
+  const [user_id, setUser_id] = useState<string>(
+    initialState?.searchFilters.user_id || ""
+  );
+  const [input_id, setInput_id] = useState<string>(
+    initialState?.searchFilters.user_id || ""
+  );
+
+  // 状態変更を親コンポーネントに通知
+  const notifyStateChange = (
+    newFormat?: string,
+    newUserId?: string,
+    page?: number
+  ) => {
+    if (onStateChange) {
+      onStateChange({
+        //ここを実行すると、親コンポーネントへstateを同期できる
+        currentPage: page || 1, // ページ指定がない場合は1にリセット
+        searchFilters: {
+          format: newFormat || undefined,
+          user_id: newUserId || undefined,
+        },
+      });
+    }
+  };
 
   const handleChange = (event: SelectChangeEvent) => {
     const format_input = event.target.value;
-    if (format_input === "") {
-      setFormat(undefined);
-    } else {
-      setFormat(format_input);
-    }
+    const newFormat = format_input === "" ? "" : format_input;
+    setFormat(newFormat);
+    notifyStateChange(newFormat, input_id);
   };
 
   const handleChangeInputText = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const userIdString = event.target.value;
-    if (userIdString === "") {
-      setUser_id(undefined);
-    } else {
-      setUser_id(userIdString);
-    }
+    setUser_id(userIdString);
   };
 
   const handleClickButton = () => {
     setInput_id(user_id);
+    notifyStateChange(format, user_id);
   };
 
   return (
@@ -70,7 +102,9 @@ export const SearchImages = () => {
             onChange={handleChangeInputText}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                setInput_id(e.currentTarget.value);
+                const newUserId = e.currentTarget.value;
+                setInput_id(newUserId);
+                notifyStateChange(format, newUserId);
               }
             }}
             size="small"
@@ -88,7 +122,12 @@ export const SearchImages = () => {
         </FormControl>
       </div>
 
-      <ImagesList format={format} user_id={input_id} />
+      <ImagesList
+        format={format || undefined}
+        user_id={input_id || undefined}
+        currentPage={initialState?.currentPage || 1}
+        onPageChange={(page) => notifyStateChange(format, input_id, page)}
+      />
     </>
   );
 };
