@@ -1,6 +1,7 @@
-import type { SpineGameObject } from "@esotericsoftware/spine-phaser-v3";
 import { Scene } from "phaser";
 import type { UserData } from "../types/PhaserTypes";
+import { TriggerObject } from "../object/TriggerObject";
+
 export class HomeGame extends Scene {
   // ログイン情報から取得したデータ
   userName: string = "Guest";
@@ -14,11 +15,11 @@ export class HomeGame extends Scene {
   playerSize = 0.7;
   cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   spaceBar!: Phaser.Input.Keyboard.Key;
-  pcObj!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-  pcObjSize = 7;
-  isOverlapping = false;
-  promptDecide!: SpineGameObject | Phaser.GameObjects.Sprite;
-  targetPosition: { x: number; y: number } | null = null; // 目的地を追加
+  targetPosition: { x: number; y: number } | null = null;
+
+  // TriggerObjectに置き換え
+  pcObject!: TriggerObject;
+  parkObject!: TriggerObject;
 
   //userDataSetter
   setUserData(userData: UserData) {
@@ -27,16 +28,17 @@ export class HomeGame extends Scene {
 
   // method from react
   toggleShowGallery?: () => void;
+  moveToPark?: () => void;
 
   constructor() {
     super("HomeGame");
   }
+
   create(data?: {
     userData?: UserData;
     sceneCallBacks?: {
       setSceneFunc?: (scene: Phaser.Scene) => void;
       onPositionUpdate?: (x: number, y: number) => void;
-      // 他のコールバックも追加可能
     };
   }) {
     if (data?.userData) {
@@ -45,6 +47,7 @@ export class HomeGame extends Scene {
     if (data?.sceneCallBacks?.setSceneFunc) {
       data.sceneCallBacks.setSceneFunc(this);
     }
+
     //bg
     this.background = this.add.image(
       this.cameras.main.centerX,
@@ -52,7 +55,6 @@ export class HomeGame extends Scene {
       "mendako-home-bg"
     );
     this.background.setOrigin(0.5, 0.5);
-    //画面サイズに収まるための倍率(scale)計算
     const scaleX = this.cameras.main.width / this.background.width;
     const scaleY = this.cameras.main.height / this.background.height;
     const scale = Math.max(scaleX, scaleY);
@@ -99,55 +101,52 @@ export class HomeGame extends Scene {
       Phaser.Input.Keyboard.KeyCodes.SPACE
     );
 
-    //PC
-    this.pcObj = this.physics.add.sprite(
-      this.cameras.main.centerX - 50,
-      this.cameras.main.centerY + 130,
-      "pc-obj"
+    // PCオブジェクトをTriggerObjectで作成
+    this.pcObject = new TriggerObject(
+      this,
+      "PC", // 表示名
+      "pc-obj", // スプライトキー
+      {
+        x: this.cameras.main.centerX - 50,
+        y: this.cameras.main.centerY + 130,
+      }, // 位置
+      () => {
+        // クリック時の処理
+        if (this.toggleShowGallery) {
+          this.toggleShowGallery();
+        }
+      },
+      7 // オブジェクトサイズ
     );
-    const pcObjScale =
-      this.cameras.main.width / this.pcObjSize / this.pcObj.width;
-    this.pcObj.setScale(pcObjScale);
-    this.pcObj.setVisible(false);
+    this.pcObject.create();
+    this.pcObject.setupOverlap(this.playerContainer);
 
-    //promptDecide
-    if (this.spine && typeof this.add.spine === "function") {
-      this.promptDecide = this.add.spine(
-        250,
-        300,
-        "prompt-data",
-        "prompt-atlas"
-      );
-      this.promptDecide.animationState.setAnimation(0, "animation", true);
-    } else {
-      console.log("spineプラグインが読み込まれていません");
-      this.promptDecide = this.add.sprite(0, 0, "prompt-sub");
-    }
-    this.promptDecide.setScale(this.cameras.main.width / 20 / this.pcObj.width);
-    this.promptDecide.setVisible(false);
-
-    //overlap
-    this.physics.add.overlap(this.playerContainer, this.pcObj, () => {
-      if (!this.promptDecide.visible) {
-        this.promptDecide.setVisible(true);
-      }
-      this.promptDecide.setPosition(this.pcObj.x, this.pcObj.y - 80);
-      this.isOverlapping = true;
-    });
-
-    // promptDecideをインタラクティブにしてクリックイベントを追加
-    this.promptDecide.setInteractive();
-    this.promptDecide.on("pointerdown", () => {
-      if (this.toggleShowGallery) {
-        this.toggleShowGallery();
-      }
-    });
+    // ParkオブジェクトをTriggerObjectで作成
+    this.parkObject = new TriggerObject(
+      this,
+      "公園", // 表示名
+      "pc-obj", // スプライトキー
+      {
+        x: this.cameras.main.centerX + 200,
+        y: this.cameras.main.centerY + 220,
+      }, // 位置
+      () => {
+        // クリック時の処理
+        if (this.moveToPark) {
+          this.moveToPark();
+        }
+      },
+      7 // オブジェクトサイズ
+    );
+    this.parkObject.create();
+    this.parkObject.setupOverlap(this.playerContainer);
 
     // マウス/タッチクリックイベントを追加
     this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
       this.targetPosition = { x: pointer.worldX, y: pointer.worldY };
     });
   }
+
   update() {
     const player = this.playerContainer.body as Phaser.Physics.Arcade.Body;
 
@@ -160,27 +159,21 @@ export class HomeGame extends Scene {
         this.targetPosition.y
       );
 
-      // 目的地に近づいたら停止
       if (distance < 5) {
         this.targetPosition = null;
         player.setVelocity(0, 0);
       } else {
-        // 目的地に向かう方向を計算
         const angle = Phaser.Math.Angle.Between(
           this.playerContainer.x,
           this.playerContainer.y,
           this.targetPosition.x,
           this.targetPosition.y
         );
-
-        // 速度を設定
         const velocityX = Math.cos(angle) * this.playerSpeed;
         const velocityY = Math.sin(angle) * this.playerSpeed;
         player.setVelocity(velocityX, velocityY);
       }
-    }
-    // キーボード操作（既存の処理を else if に変更）
-    else if (this.cursors.right.isDown) {
+    } else if (this.cursors.right.isDown) {
       player.setVelocityX(this.playerSpeed);
       player.setVelocityY(0);
     } else if (this.cursors.left.isDown) {
@@ -196,8 +189,42 @@ export class HomeGame extends Scene {
       player.setVelocity(0, 0);
     }
 
-    // 表示切り替えをフラグで制御
-    this.promptDecide.setVisible(this.isOverlapping);
-    this.isOverlapping = false;
+    // オブジェクトの更新
+    this.pcObject.update();
+    this.parkObject.update();
+  }
+
+  destroy() {
+    // イベントリスナーの削除
+    this.input.off("pointerdown");
+
+    // キーボードイベントの削除
+    if (this.cursors) {
+      this.input.keyboard?.removeKey(this.cursors.left);
+      this.input.keyboard?.removeKey(this.cursors.right);
+      this.input.keyboard?.removeKey(this.cursors.up);
+      this.input.keyboard?.removeKey(this.cursors.down);
+    }
+
+    if (this.spaceBar) {
+      this.input.keyboard?.removeKey(this.spaceBar);
+    }
+
+    // TriggerObjectのクリーンアップ
+    if (this.pcObject) {
+      this.pcObject.destroy();
+    }
+    if (this.parkObject) {
+      this.parkObject.destroy();
+    }
+
+    // 外部参照の削除
+    this.toggleShowGallery = undefined;
+    this.targetPosition = null;
+  }
+
+  shutdown() {
+    // シーン終了時のクリーンアップ
+    this.targetPosition = null;
   }
 }
