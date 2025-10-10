@@ -1,11 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import type { UserData } from "../phaser/types/PhaserTypes";
 import { fetchUserData } from "../func/fetchUserData";
-// import { v4 as uuidv4, v4 } from "uuid";
 import { PhaserGame } from "../components/PhaserGame";
 import { WsEventHandler } from "../func/wsEventHandler";
 import { Box, Button, Paper, TextField } from "@mui/material";
 import { useNavigate } from "react-router";
+import {
+  MySnackbarComponent,
+  type SnackbarRef,
+} from "../components/MySnackbarComponent";
+
 type UserPosition = {
   x: number;
   y: number;
@@ -17,6 +21,7 @@ export const Park = () => {
   const [eventQueue, setEventQueue] = useState<any[]>([]);
   const phaserUserPositionRef = useRef<UserPosition>({ x: 0, y: 0 });
   const wsRef = useRef<WebSocket | null>(null);
+  const snackbarRef = useRef<SnackbarRef>(null);
   const [phaserMessage, setPhaserMessage] = useState("");
   const navigate = useNavigate();
   const handleSetSceneFunc = (scene: Phaser.Scene) => {
@@ -35,17 +40,35 @@ export const Park = () => {
       );
     }
   };
+
+  // アラートを表示する関数
+  const showAlert = (
+    message: string,
+    severity: "success" | "error" | "warning" | "info" = "info"
+  ) => {
+    snackbarRef.current?.showAlert(message, severity);
+  };
+
   useEffect(() => {
     const getMe = async () => {
       const me = await fetchUserData();
       if (me) {
         setUserData(me);
+        showAlert(`${me.name}さん、パークへようこそ！`, "success");
       } else {
-        navigate("/login");
+        showAlert("ログインが必要です", "error");
+
+        // タイマーIDを保存してクリーンアップ可能にする
+        const timer = setTimeout(() => {
+          navigate("/login");
+        }, 3000);
+
+        // コンポーネントがアンマウントされたらタイマーをクリア
+        return () => clearTimeout(timer);
       }
     };
     getMe();
-  }, []);
+  }, [navigate]);
   useEffect(() => {
     //　シーンを準備後、受信したイベントを処理する
     if (scene) {
@@ -122,13 +145,11 @@ export const Park = () => {
               >
                 送信
               </Button>
-              /
             </Box>
           </Paper>
         </>
-
-        // ここにMUIを用いてテキストを送信するための簡単なフォーム
       )}
+      <MySnackbarComponent ref={snackbarRef} />
     </>
   );
 };
