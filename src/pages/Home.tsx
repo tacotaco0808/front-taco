@@ -6,11 +6,12 @@ import type { HomeGame } from "../phaser/scenes/HomeGame";
 import { SearchImages } from "../components/SearchImages";
 import axios from "axios";
 import type { UserData } from "../phaser/types/PhaserTypes";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { Button } from "@mui/material";
 import { LoginStatus } from "../components/LoginStatus";
 
 export const Home = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const [isVisbleGallery, setIsVisibleGallery] = useState(false);
   const [isVisiblePhaser, setIsVisiblePhaser] = useState(false);
@@ -45,6 +46,9 @@ export const Home = () => {
   const handleSetSceneFunc = (scene: Phaser.Scene) => {
     (scene as HomeGame).toggleShowGallery = () => {
       setIsVisibleGallery((prev) => !prev);
+    };
+    (scene as HomeGame).moveToPark = () => {
+      navigate("/park");
     };
   };
 
