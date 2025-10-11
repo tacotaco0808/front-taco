@@ -3,7 +3,6 @@ import type { UserData } from "../types/PhaserTypes";
 import { PlayerManager } from "../character/Characters";
 import type {
   AllChatEventData,
-  EventData,
   LoginEventData,
   LogoutEventData,
   PositionEventData,
@@ -23,8 +22,14 @@ export class ParkGame extends Scene {
   playerContainer!: Phaser.GameObjects.Container;
   playerSize = 0.7;
   targetPosition: { x: number; y: number } | null = null; // 目的地を追加
+
+  // 自分のチャット機能
+  private myChatText?: Phaser.GameObjects.Text;
+  private myChatTimer?: Phaser.Time.TimerEvent;
+
   //コールバック関数
   onPositionUpdate?: (x: number, y: number) => void;
+  onSendChat?: (message: string) => void;
 
   constructor() {
     super({
@@ -44,6 +49,7 @@ export class ParkGame extends Scene {
     sceneCallBacks?: {
       setSceneFunc?: (scene: Phaser.Scene) => void;
       onPositionUpdate?: (x: number, y: number) => void;
+      onSendChat?: (message: string) => void;
       // 他のコールバックも追加可能
     };
   }) {
@@ -57,6 +63,9 @@ export class ParkGame extends Scene {
     }
     if (data?.sceneCallBacks?.onPositionUpdate) {
       this.onPositionUpdate = data.sceneCallBacks.onPositionUpdate;
+    }
+    if (data?.sceneCallBacks?.onSendChat) {
+      this.onSendChat = data.sceneCallBacks.onSendChat;
     }
     //bg
     this.background = this.add.image(
@@ -147,6 +156,9 @@ export class ParkGame extends Scene {
         player.allChat(data.content.message, 5000);
       }
     });
+
+    // シーン終了時のクリーンアップを登録
+    this.events.once("shutdown", this.shutdown, this);
   }
   update() {
     const player = this.playerContainer.body as Phaser.Physics.Arcade.Body;
@@ -195,5 +207,64 @@ export class ParkGame extends Scene {
     } else {
       player.setVelocity(0, 0);
     }
+  }
+
+  /**
+   * 自分のチャットメッセージを表示する
+   * @param message 表示するメッセージ
+   * @param duration 表示時間（ミリ秒、デフォルト5000ms）
+   */
+  showMyChat(message: string, duration: number = 5000) {
+    if (!this.playerContainer) return;
+
+    // 既存のチャットメッセージがあれば削除
+    this.clearMyChat();
+
+    // チャットテキストを作成
+    this.myChatText = this.add
+      .text(0, -120, message, {
+        fontSize: "18px",
+        color: "#ffffff",
+        backgroundColor: "#000000aa",
+        padding: { x: 8, y: 4 },
+        wordWrap: { width: 200, useAdvancedWrap: true },
+      })
+      .setOrigin(0.5);
+
+    // チャットテキストをプレイヤーコンテナに追加
+    this.playerContainer.add(this.myChatText);
+    this.myChatText.setDepth(20);
+
+    // 指定時間後にメッセージを削除
+    this.myChatTimer = this.time.delayedCall(duration, () => {
+      this.clearMyChat();
+    });
+  }
+
+  /**
+   * 自分のチャットメッセージをクリア
+   */
+  private clearMyChat() {
+    if (this.myChatText) {
+      this.myChatText.destroy();
+      this.myChatText = undefined;
+    }
+    if (this.myChatTimer) {
+      this.myChatTimer.destroy();
+      this.myChatTimer = undefined;
+    }
+  }
+
+  /**
+   * シーン終了時のクリーンアップ
+   */
+  shutdown() {
+    this.clearMyChat();
+    // イベントリスナーの削除
+    this.events.off("login");
+    this.events.off("logout");
+    this.events.off("position");
+    this.events.off("allChat");
+    this.input.off("pointerdown");
   }
 }

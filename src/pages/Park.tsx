@@ -16,7 +16,7 @@ type UserPosition = {
 };
 export const Park = () => {
   const [userData, setUserData] = useState<UserData | null>();
-  const [scene, setScene] = useState<Phaser.Scene | null>();
+  const [scene, setScene] = useState<Phaser.Scene | null>(); //　sceneをphaser側から持ってくることで、データや関数を橋渡し
   const wsEventHandler = useRef<WsEventHandler>(new WsEventHandler()).current;
   const [eventQueue, setEventQueue] = useState<any[]>([]);
   const phaserUserPositionRef = useRef<UserPosition>({ x: 0, y: 0 });
@@ -38,6 +38,13 @@ export const Park = () => {
           content: phaserUserPositionRef,
         })
       );
+    }
+  };
+
+  // チャット送信時にPhaserでも表示
+  const handleSendChat = (message: string) => {
+    if (scene && "showMyChat" in scene) {
+      (scene as any).showMyChat(message);
     }
   };
 
@@ -108,6 +115,7 @@ export const Park = () => {
   }, [userData]);
   const handleSendMessage = () => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      // WebSocketでサーバーに送信
       wsRef.current.send(
         JSON.stringify({
           event: "allChat",
@@ -115,6 +123,12 @@ export const Park = () => {
           content: { message: phaserMessage },
         } as AllChatEventData)
       );
+
+      // 自分の画面でもチャットを表示
+      handleSendChat(phaserMessage);
+
+      // 入力フィールドをクリア
+      setPhaserMessage("");
     }
   };
   return (
@@ -127,6 +141,7 @@ export const Park = () => {
             sceneCallBacks={{
               setSceneFunc: handleSetSceneFunc,
               onPositionUpdate: handlePositionUpdate,
+              onSendChat: handleSendChat,
             }}
           />
           <Paper
