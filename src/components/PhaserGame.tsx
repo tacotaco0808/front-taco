@@ -4,6 +4,7 @@ import type { UserData } from "../phaser/types/PhaserTypes";
 type SceneCallBacks = {
   setSceneFunc?: (scene: Phaser.Scene) => void;
   onPositionUpdate?: (x: number, y: number) => void;
+  onSendChat?: (message: string) => void;
 };
 type Props = {
   sceneName: SceneName;
