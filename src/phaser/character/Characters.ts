@@ -59,6 +59,9 @@ export class PlayerManager {
     );
     playerBody.setCollideWorldBounds(true);
 
+    // プレイヤーにシーンの参照を設定
+    player.setScene(scene);
+
     //listにplayer追加
     this.players[key] = player;
     return player;
@@ -67,9 +70,8 @@ export class PlayerManager {
     //listからplayer削除
     if (this.players[key]) {
       const player = this.players[key];
-      player.sprite.destroy();
-      player.usernameText.destroy();
-      player.playerContainer.destroy();
+      // プレイヤーのクリーンアップメソッドを呼び出し
+      player.destroy();
       delete this.players[key];
     }
   }
@@ -84,6 +86,11 @@ export class Player {
   playerSize = 0.7;
   userData!: UserData;
 
+  // チャット関連
+  private chatText?: Phaser.GameObjects.Text;
+  private chatTimer?: Phaser.Time.TimerEvent;
+  private scene?: Phaser.Scene;
+
   // username: string;
   x: number;
   y: number;
@@ -92,6 +99,59 @@ export class Player {
     this.y = y;
     // this.username = username;
   }
+
+  setScene(scene: Phaser.Scene) {
+    this.scene = scene;
+  }
+
+  allChat(message: string, duration: number = 3000) {
+    if (!this.scene || !this.playerContainer) return;
+
+    // 既存のチャットメッセージがあれば削除
+    this.clearChat();
+
+    // チャットテキストを作成
+    this.chatText = this.scene.add
+      .text(0, -120, message, {
+        fontSize: "18px",
+        color: "#ffffff",
+        backgroundColor: "#000000aa",
+        padding: { x: 8, y: 4 },
+        wordWrap: { width: 200, useAdvancedWrap: true },
+      })
+      .setOrigin(0.5);
+
+    // チャットテキストをプレイヤーコンテナに追加
+    this.playerContainer.add(this.chatText);
+    this.chatText.setDepth(20);
+
+    // 指定時間後にメッセージを削除
+    this.chatTimer = this.scene.time.delayedCall(duration, () => {
+      this.clearChat();
+    });
+  }
+
+  private clearChat() {
+    if (this.chatText) {
+      this.chatText.destroy();
+      this.chatText = undefined;
+    }
+    if (this.chatTimer) {
+      this.chatTimer.destroy();
+      this.chatTimer = undefined;
+    }
+  }
+
+  /**
+   * プレイヤーを破棄する際のクリーンアップ
+   */
+  destroy() {
+    this.clearChat();
+    if (this.sprite) this.sprite.destroy();
+    if (this.usernameText) this.usernameText.destroy();
+    if (this.playerContainer) this.playerContainer.destroy();
+  }
+
   /**ログインイベントをwsから拾って、phaser側でログインの処理する(アバター
    * 表示とログアウトの削除
   ) */
