@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { UserData } from "../phaser/types/PhaserTypes";
 import { fetchUserData } from "../func/fetchUserData";
 import { PhaserGame } from "../components/PhaserGame";
-import { WsEventHandler } from "../func/wsEventHandler";
+import { WsEventHandler, type AllChatEventData } from "../func/wsEventHandler";
 import { Box, Button, Paper, TextField } from "@mui/material";
 import { useNavigate } from "react-router";
 import {
@@ -107,7 +107,15 @@ export const Park = () => {
     };
   }, [userData]);
   const handleSendMessage = () => {
-    setPhaserMessage("");
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(
+        JSON.stringify({
+          event: "allChat",
+          player_id: userData?.user_id,
+          content: { message: phaserMessage },
+        } as AllChatEventData)
+      );
+    }
   };
   return (
     <>

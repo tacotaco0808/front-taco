@@ -12,7 +12,7 @@ export type EventContentMap = {
   };
   allChat: {
     message: string;
-    timestamp: number;
+    timestamp?: number;
   };
 };
 // ベースのEventData型をジェネリクスに変更
@@ -27,7 +27,7 @@ export type EventData<T extends keyof EventContentMap = keyof EventContentMap> =
 export type PositionEventData = EventData<"position">;
 export type LoginEventData = EventData<"login">;
 export type LogoutEventData = EventData<"logout">;
-export type ChatEventData = EventData<"allChat">;
+export type AllChatEventData = EventData<"allChat">;
 
 export class WsEventHandler {
   private scene: Phaser.Scene | null = null;

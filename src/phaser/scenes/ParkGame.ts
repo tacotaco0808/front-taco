@@ -2,7 +2,10 @@ import { Scene } from "phaser";
 import type { UserData } from "../types/PhaserTypes";
 import { PlayerManager } from "../character/Characters";
 import type {
+  AllChatEventData,
   EventData,
+  LoginEventData,
+  LogoutEventData,
   PositionEventData,
   WsEventHandler,
 } from "../../func/wsEventHandler";
@@ -123,10 +126,10 @@ export class ParkGame extends Scene {
     });
 
     //Reactで受信したeventを処理
-    this.events.on("login", (data: EventData) => {
+    this.events.on("login", (data: LoginEventData) => {
       this.playerManager.addPlayer(data.player_id, 100, 100, this);
     });
-    this.events.on("logout", (data: EventData) => {
+    this.events.on("logout", (data: LogoutEventData) => {
       this.playerManager.removePlayer(data.player_id);
     });
     this.events.on("position", (data: PositionEventData) => {
@@ -138,8 +141,12 @@ export class ParkGame extends Scene {
         );
       }
     });
-    //ユーザのチャットをする部分
-    this.events.on("allChat", () => {});
+    this.events.on("allChat", (data: AllChatEventData) => {
+      const player = this.playerManager.getPlayer(data.player_id);
+      if (player && data.content) {
+        player.allChat(data.content.message, 5000);
+      }
+    });
   }
   update() {
     const player = this.playerContainer.body as Phaser.Physics.Arcade.Body;
