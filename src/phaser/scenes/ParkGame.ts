@@ -1,7 +1,11 @@
 import { Scene } from "phaser";
 import type { UserData } from "../types/PhaserTypes";
 import { PlayerManager } from "../character/Characters";
-import type { EventData, WsEventHandler } from "../../func/wsEventHandler";
+import type {
+  EventData,
+  PositionEventData,
+  WsEventHandler,
+} from "../../func/wsEventHandler";
 
 export class ParkGame extends Scene {
   userName: string = "NoName";
@@ -118,29 +122,24 @@ export class ParkGame extends Scene {
       },
     });
 
-    //event
+    //Reactで受信したeventを処理
     this.events.on("login", (data: EventData) => {
       this.playerManager.addPlayer(data.player_id, 100, 100, this);
     });
     this.events.on("logout", (data: EventData) => {
       this.playerManager.removePlayer(data.player_id);
     });
-    // 自分以外のアバターの位置同期
-    this.events.on(
-      "position",
-      (data: EventData & { content?: { x: number; y: number } }) => {
-        const player = this.playerManager.getPlayer(data.player_id);
-        if (player && data.content?.current) {
-          console.log(
-            "debug:::" + data.content.current.x + ":" + data.content.current.y
-          );
-          player.playerContainer.setPosition(
-            data.content.current.x,
-            data.content.current.y
-          );
-        }
+    this.events.on("position", (data: PositionEventData) => {
+      const player = this.playerManager.getPlayer(data.player_id);
+      if (player && data.content?.current) {
+        player.playerContainer.setPosition(
+          data.content.current.x,
+          data.content.current.y
+        );
       }
-    );
+    });
+    //ユーザのチャットをする部分
+    this.events.on("allChat", () => {});
   }
   update() {
     const player = this.playerContainer.body as Phaser.Physics.Arcade.Body;
