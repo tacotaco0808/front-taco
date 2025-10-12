@@ -120,18 +120,9 @@ export class ParkGame extends Scene {
     // マウス/タッチクリックイベントを追加
     this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
       this.targetPosition = { x: pointer.worldX, y: pointer.worldY };
-    });
-
-    //定期イベント
-    this.time.addEvent({
-      delay: 500,
-      loop: true,
-      callback: () => {
-        // ここにonPositionUpdate
-        if (this.onPositionUpdate) {
-          this.onPositionUpdate(this.playerContainer.x, this.playerContainer.y);
-        }
-      },
+      if (this.onPositionUpdate) {
+        this.onPositionUpdate(pointer.worldX, pointer.worldY);
+      }
     });
 
     //Reactで受信したeventを処理
@@ -144,10 +135,8 @@ export class ParkGame extends Scene {
     this.events.on("position", (data: PositionEventData) => {
       const player = this.playerManager.getPlayer(data.player_id);
       if (player && data.content?.current) {
-        player.playerContainer.setPosition(
-          data.content.current.x,
-          data.content.current.y
-        );
+        const targetPosition = data.content.current;
+        player.setTargetPosition(targetPosition);
       }
     });
     this.events.on("allChat", (data: AllChatEventData) => {
@@ -161,6 +150,7 @@ export class ParkGame extends Scene {
     this.events.once("shutdown", this.shutdown, this);
   }
   update() {
+    /*自分の動き */
     const player = this.playerContainer.body as Phaser.Physics.Arcade.Body;
 
     // タッチ移動の処理
@@ -206,6 +196,12 @@ export class ParkGame extends Scene {
       player.setVelocityX(0);
     } else {
       player.setVelocity(0, 0);
+    }
+    /*他プレイヤーの動き */
+    for (const otherPlayer of Object.values(
+      this.playerManager.getAllPlayers()
+    )) {
+      otherPlayer.update();
     }
   }
 
