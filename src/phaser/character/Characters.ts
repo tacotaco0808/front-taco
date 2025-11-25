@@ -66,6 +66,7 @@ export class PlayerManager {
     this.players[key] = player;
     return player;
   }
+
   removePlayer(key: string) {
     //listからplayer削除
     if (this.players[key]) {
@@ -75,8 +76,13 @@ export class PlayerManager {
       delete this.players[key];
     }
   }
+
   getPlayer(key: string): Player | undefined {
     return this.players[key];
+  }
+
+  getAllPlayers(): Record<string, Player> {
+    return this.players;
   }
 }
 export class Player {
@@ -85,6 +91,7 @@ export class Player {
   playerContainer!: Phaser.GameObjects.Container;
   playerSize = 0.7;
   userData!: UserData;
+  playerSpeed: number;
 
   // チャット関連
   private chatText?: Phaser.GameObjects.Text;
@@ -94,14 +101,24 @@ export class Player {
   // username: string;
   x: number;
   y: number;
-  constructor(x: number, y: number) {
+
+  //ユーザの移動目的地点
+  targetPosition: { x: number; y: number } | null;
+
+  constructor(x: number, y: number, playerSpeed: number = 100) {
     this.x = x;
     this.y = y;
+    this.playerSpeed = playerSpeed;
+    this.targetPosition = { x, y };
     // this.username = username;
   }
 
   setScene(scene: Phaser.Scene) {
     this.scene = scene;
+  }
+
+  setTargetPosition(targetPosition: { x: number; y: number }) {
+    this.targetPosition = targetPosition;
   }
 
   allChat(message: string, duration: number = 3000) {
@@ -141,7 +158,37 @@ export class Player {
       this.chatTimer = undefined;
     }
   }
+  update() {
+    const player = this.playerContainer.body as Phaser.Physics.Arcade.Body;
+    // タッチ移動の処理
+    if (this.targetPosition) {
+      const distance = Phaser.Math.Distance.Between(
+        this.playerContainer.x,
+        this.playerContainer.y,
+        this.targetPosition.x,
+        this.targetPosition.y
+      );
 
+      // 目的地に近づいたら停止
+      if (distance < 5) {
+        this.targetPosition = null;
+        player.setVelocity(0, 0);
+      } else {
+        // 目的地に向かう方向を計算
+        const angle = Phaser.Math.Angle.Between(
+          this.playerContainer.x,
+          this.playerContainer.y,
+          this.targetPosition.x,
+          this.targetPosition.y
+        );
+
+        // 速度を設定
+        const velocityX = Math.cos(angle) * this.playerSpeed * 2;
+        const velocityY = Math.sin(angle) * this.playerSpeed * 2;
+        player.setVelocity(velocityX, velocityY);
+      }
+    }
+  }
   /**
    * プレイヤーを破棄する際のクリーンアップ
    */
