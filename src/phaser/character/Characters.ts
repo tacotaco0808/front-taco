@@ -183,8 +183,8 @@ export class Player {
         );
 
         // 速度を設定
-        const velocityX = Math.cos(angle) * this.playerSpeed * 2;
-        const velocityY = Math.sin(angle) * this.playerSpeed * 2;
+        const velocityX = Math.cos(angle) * this.playerSpeed;
+        const velocityY = Math.sin(angle) * this.playerSpeed;
         player.setVelocity(velocityX, velocityY);
       }
     }
