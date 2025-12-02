@@ -44,6 +44,7 @@ export const Home = () => {
   };
 
   const handleSetSceneFunc = (scene: Phaser.Scene) => {
+    /**ラムダ式で、先に送る側のインターフェースでtoggleShowGalleryを定義 */
     (scene as HomeGame).toggleShowGallery = () => {
       setIsVisibleGallery((prev) => !prev);
     };
