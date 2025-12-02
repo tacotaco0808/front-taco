@@ -26,7 +26,10 @@ export class Preloader extends Scene {
       const { userData, sceneCallBacks, scene } =
         (this.scene.settings.data as PreloaderSceneData) || {};
       if (scene === "home") {
-        this.scene.start("HomeGame", { userData, sceneCallBacks });
+        this.scene.start("HomeGame", {
+          userData,
+          sceneCallBacks,
+        }); /**ここで、()=>{}このラムダ式(Home.tsxのtoggleShowGallery)をぶちこんでいる */
       } else if (scene === "park") {
         this.scene.start("ParkGame", { userData, sceneCallBacks });
       }
