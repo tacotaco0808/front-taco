@@ -20,6 +20,7 @@ export class HomeGame extends Scene {
   // TriggerObjectに置き換え
   pcObject!: TriggerObject;
   parkObject!: TriggerObject;
+  appleObject!: TriggerObject;
 
   //userDataSetter
   setUserData(userData: UserData) {
@@ -141,6 +142,22 @@ export class HomeGame extends Scene {
     this.parkObject.create();
     this.parkObject.setupOverlap(this.playerContainer);
 
+    //appleObjectをtriggerObjectで作成
+    this.appleObject = new TriggerObject(
+      this,
+      "apple",
+      "",
+      {
+        x: this.cameras.main.centerX,
+        y: this.cameras.main.centerY,
+      },
+      () => {
+        console.log("aiueo");
+      }
+    );
+    this.appleObject.create();
+    this.appleObject.setupOverlap(this.playerContainer);
+
     // マウス/タッチクリックイベントを追加
     this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
       this.targetPosition = { x: pointer.worldX, y: pointer.worldY };
@@ -192,6 +209,7 @@ export class HomeGame extends Scene {
     // オブジェクトの更新
     this.pcObject.update();
     this.parkObject.update();
+    this.appleObject.update();
   }
 
   destroy() {
@@ -216,6 +234,9 @@ export class HomeGame extends Scene {
     }
     if (this.parkObject) {
       this.parkObject.destroy();
+    }
+    if (this.appleObject) {
+      this.appleObject.destroy();
     }
 
     // 外部参照の削除
