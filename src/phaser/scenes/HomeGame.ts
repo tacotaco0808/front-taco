@@ -20,6 +20,10 @@ export class HomeGame extends Scene {
   // TriggerObjectに置き換え
   pcObject!: TriggerObject;
   parkObject!: TriggerObject;
+  appleObject!: TriggerObject;
+
+  //リンゴのオブジェクト用
+  fallingApples!: Phaser.Physics.Arcade.Group;
 
   //userDataSetter
   setUserData(userData: UserData) {
@@ -105,6 +109,7 @@ export class HomeGame extends Scene {
     this.pcObject = new TriggerObject(
       this,
       "PC", // 表示名
+      false,
       "pc-obj", // スプライトキー
       {
         x: this.cameras.main.centerX - 50,
@@ -125,6 +130,7 @@ export class HomeGame extends Scene {
     this.parkObject = new TriggerObject(
       this,
       "公園", // 表示名
+      false,
       "pc-obj", // スプライトキー
       {
         x: this.cameras.main.centerX + 200,
@@ -140,6 +146,31 @@ export class HomeGame extends Scene {
     );
     this.parkObject.create();
     this.parkObject.setupOverlap(this.playerContainer);
+
+    //appleObjectをtriggerObjectで作成
+    this.appleObject = new TriggerObject(
+      this,
+      "apple",
+      false,
+      "",
+      {
+        x: this.cameras.main.centerX - 140,
+        y: this.cameras.main.centerY - 150,
+      },
+      () => {
+        this.spawnFallingApple();
+      }
+    );
+    this.appleObject.create();
+    this.appleObject.setupOverlap(this.playerContainer);
+
+    //リンゴ物理グループ作成
+    this.fallingApples = this.physics.add.group({
+      allowGravity: true,
+      gravityY: 300,
+      bounceY: 0.6,
+      collideWorldBounds: true,
+    });
 
     // マウス/タッチクリックイベントを追加
     this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
@@ -192,6 +223,7 @@ export class HomeGame extends Scene {
     // オブジェクトの更新
     this.pcObject.update();
     this.parkObject.update();
+    this.appleObject.update();
   }
 
   destroy() {
@@ -217,6 +249,9 @@ export class HomeGame extends Scene {
     if (this.parkObject) {
       this.parkObject.destroy();
     }
+    if (this.appleObject) {
+      this.appleObject.destroy();
+    }
 
     // 外部参照の削除
     this.toggleShowGallery = undefined;
@@ -226,5 +261,37 @@ export class HomeGame extends Scene {
   shutdown() {
     // シーン終了時のクリーンアップ
     this.targetPosition = null;
+  }
+
+  // 新しいりんごを生成するメソッド
+  spawnFallingApple() {
+    const randomX = Phaser.Math.Between(10, this.cameras.main.width - 10);
+    const apple = this.physics.add.sprite(randomX, 0, "mendako");
+
+    // 物理設定
+    const appleBody = apple.body as Phaser.Physics.Arcade.Body;
+    appleBody.setGravityY(300);
+    appleBody.setBounce(0.6);
+    appleBody.setCollideWorldBounds(true);
+
+    // サイズ調整
+    const scale = this.cameras.main.width / 15 / apple.width;
+    apple.setScale(scale);
+
+    // グループに追加
+    this.fallingApples.add(apple);
+
+    // プレイヤーとの衝突検出
+    this.physics.add.overlap(this.playerContainer, apple, () => {
+      console.log("りんごをキャッチ！");
+      apple.destroy();
+    });
+
+    // 5秒後に自動削除
+    this.time.delayedCall(5000, () => {
+      if (apple.active) {
+        apple.destroy();
+      }
+    });
   }
 }
