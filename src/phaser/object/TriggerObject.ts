@@ -2,6 +2,7 @@ export class TriggerObject {
   scene: Phaser.Scene;
   displayName: string;
   position: { x: number; y: number };
+  isVisible: boolean;
   spriteKey: string;
   collisionObj!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
   promptDecide!: Phaser.GameObjects.Text;
@@ -14,6 +15,7 @@ export class TriggerObject {
   constructor(
     scene: Phaser.Scene,
     displayName: string,
+    isVisible: boolean,
     spriteKey: string,
     position: { x: number; y: number },
     handleInteraction: () => void,
@@ -21,6 +23,7 @@ export class TriggerObject {
   ) {
     this.scene = scene;
     this.displayName = displayName;
+    this.isVisible = isVisible;
     this.spriteKey = spriteKey;
     this.position = position;
     this.handleInteraction = handleInteraction;
@@ -38,7 +41,7 @@ export class TriggerObject {
     const objScale =
       this.scene.cameras.main.width / this.objSize / this.collisionObj.width;
     this.collisionObj.setScale(objScale);
-    this.collisionObj.setVisible(false);
+    this.collisionObj.setVisible(this.isVisible);
 
     // プロンプトテキスト作成
     this.promptDecide = this.scene.add.text(0, 0, this.displayName, {
