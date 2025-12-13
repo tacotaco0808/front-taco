@@ -106,6 +106,7 @@ export class HomeGame extends Scene {
     this.pcObject = new TriggerObject(
       this,
       "PC", // 表示名
+      false,
       "pc-obj", // スプライトキー
       {
         x: this.cameras.main.centerX - 50,
@@ -126,6 +127,7 @@ export class HomeGame extends Scene {
     this.parkObject = new TriggerObject(
       this,
       "公園", // 表示名
+      false,
       "pc-obj", // スプライトキー
       {
         x: this.cameras.main.centerX + 200,
@@ -146,6 +148,7 @@ export class HomeGame extends Scene {
     this.appleObject = new TriggerObject(
       this,
       "apple",
+      false,
       "",
       {
         x: this.cameras.main.centerX,
