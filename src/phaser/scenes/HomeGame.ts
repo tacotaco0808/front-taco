@@ -22,6 +22,9 @@ export class HomeGame extends Scene {
   parkObject!: TriggerObject;
   appleObject!: TriggerObject;
 
+  //リンゴのオブジェクト用
+  fallingApples!: Phaser.Physics.Arcade.Group;
+
   //userDataSetter
   setUserData(userData: UserData) {
     this.userName = userData.name;
@@ -155,11 +158,19 @@ export class HomeGame extends Scene {
         y: this.cameras.main.centerY,
       },
       () => {
-        console.log("aiueo");
+        this.spawnFallingApple();
       }
     );
     this.appleObject.create();
     this.appleObject.setupOverlap(this.playerContainer);
+
+    //リンゴ物理グループ作成
+    this.fallingApples = this.physics.add.group({
+      allowGravity: true,
+      gravityY: 300,
+      bounceY: 0.6,
+      collideWorldBounds: true,
+    });
 
     // マウス/タッチクリックイベントを追加
     this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
@@ -250,5 +261,37 @@ export class HomeGame extends Scene {
   shutdown() {
     // シーン終了時のクリーンアップ
     this.targetPosition = null;
+  }
+
+  // 新しいりんごを生成するメソッド
+  spawnFallingApple() {
+    const randomX = Phaser.Math.Between(10, this.cameras.main.width - 10);
+    const apple = this.physics.add.sprite(randomX, 0, "apple-sprite");
+
+    // 物理設定
+    const appleBody = apple.body as Phaser.Physics.Arcade.Body;
+    appleBody.setGravityY(300);
+    appleBody.setBounce(0.6);
+    appleBody.setCollideWorldBounds(true);
+
+    // サイズ調整
+    const scale = this.cameras.main.width / 15 / apple.width;
+    apple.setScale(scale);
+
+    // グループに追加
+    this.fallingApples.add(apple);
+
+    // プレイヤーとの衝突検出
+    this.physics.add.overlap(this.playerContainer, apple, () => {
+      console.log("りんごをキャッチ！");
+      apple.destroy();
+    });
+
+    // 5秒後に自動削除
+    this.time.delayedCall(5000, () => {
+      if (apple.active) {
+        apple.destroy();
+      }
+    });
   }
 }
