@@ -154,8 +154,8 @@ export class HomeGame extends Scene {
       false,
       "",
       {
-        x: this.cameras.main.centerX,
-        y: this.cameras.main.centerY,
+        x: this.cameras.main.centerX - 140,
+        y: this.cameras.main.centerY - 150,
       },
       () => {
         this.spawnFallingApple();
@@ -266,7 +266,7 @@ export class HomeGame extends Scene {
   // 新しいりんごを生成するメソッド
   spawnFallingApple() {
     const randomX = Phaser.Math.Between(10, this.cameras.main.width - 10);
-    const apple = this.physics.add.sprite(randomX, 0, "apple-sprite");
+    const apple = this.physics.add.sprite(randomX, 0, "mendako");
 
     // 物理設定
     const appleBody = apple.body as Phaser.Physics.Arcade.Body;
