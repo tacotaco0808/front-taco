@@ -17,4 +17,4 @@ VITE_WS = wss://hogehoge/api </br>
 websocketの通信でhttpsドメインでないと、正常に動かない </br>
 ※今回はローカル動作時(npm run dev)はオレオレ署名で秘密鍵をローカルから読み込んでいる
 
-.envファイルの上書きをしたい場合は、ローカルの.env.productionを書き換えて、mainにマージするとGitHubActionsで自動で書き換えてくれる。
+.envファイルの上書きをしたい場合は、GitHubのSecretsを書き換えて、mainに何かしらマージすると自動デプロイしてくれる
